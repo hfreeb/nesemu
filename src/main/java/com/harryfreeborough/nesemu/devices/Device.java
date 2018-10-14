@@ -1,6 +1,6 @@
 package com.harryfreeborough.nesemu.devices;
 
-import com.google.common.base.Preconditions;
+import com.harryfreeborough.nesemu.utils.Preconditions;
 
 public interface Device extends Comparable<Device> {
 
