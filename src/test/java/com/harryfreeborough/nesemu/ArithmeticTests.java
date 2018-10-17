@@ -25,7 +25,7 @@ public class ArithmeticTests {
 
     @After
     public void verify() {
-        this.cpu.execute();
+        while(this.cpu.run());
 
         assertEquals(15, this.store.regA);
     }
@@ -33,10 +33,17 @@ public class ArithmeticTests {
     @Test
     public void adc() {
         /*
-        ADC #$15
+        LDA $00 (value at 00)
+        ADC #1
+        CMP #10
+        BNE *-4
          */
 
-        MemoryUtils.programWrite(this.bus, this.store, 0x69, 15);
+        MemoryUtils.programWrite(this.bus, this.store,
+                0xA5, 0,
+                0x69, 1,
+                0xC9, 10,
+                0xD0, 0b11111100);
     }
 
 }

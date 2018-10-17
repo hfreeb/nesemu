@@ -15,6 +15,11 @@ public class CpuState {
     //16-bit program counter
     public int regPc = 0x400;
 
+    //Carry flag - Enables multi-byte arithmetic operations and indicates whether
+    //the result of the previous operation on the accumulator register
+    //overflowed from bit 7 or underflowed from bit 0.
+    public boolean flagC = false; //TODO: starts at 0 or 1?
+
     public boolean flagN = false;
 
     //Overflow flag - Indicates whether the result of the previous operation
@@ -26,10 +31,6 @@ public class CpuState {
     //and is being handled.
     public boolean flagB = false;
 
-    //Decimal flag - Indicates whether BCD (binary coded decimal) mode is used
-    //in arithmetic operations (true) or binary mode is used (false).
-    public boolean flagD = false;
-
     //Interrupt flag - Indicates whether interrupts are either prevented (false)
     //or enabled (true).
     public boolean flagI = true;
@@ -37,10 +38,5 @@ public class CpuState {
     //Zero flag - Indicates whether the result of the previous operation
     //on the accumulator register was 0.
     public boolean flagZ = false;
-
-    //Carry flag - Enables multi-byte arithmetic operations and indicates whether
-    //the result of the previous operation on the accumulator register
-    //overflowed from bit 7 or underflowed from bit 0.
-    public boolean flagC = false;
 
 }
