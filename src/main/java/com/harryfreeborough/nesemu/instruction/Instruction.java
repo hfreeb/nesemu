@@ -33,7 +33,9 @@ public enum Instruction {
     }),
     BNE((cpu, mode) -> {
         if (!cpu.getState().flagZ) {
-            cpu.getState().regPc += mode.read1(cpu) - 3;
+            cpu.getState().regPc = mode.obtainAddress(cpu);
+        } else {
+            cpu.getState().regPc++; //Skip arg
         }
     });
 

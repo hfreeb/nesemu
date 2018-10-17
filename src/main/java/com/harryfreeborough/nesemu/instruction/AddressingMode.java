@@ -3,6 +3,7 @@ package com.harryfreeborough.nesemu.instruction;
 import com.harryfreeborough.nesemu.Cpu;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
+//TODO: $ prefix should be hexadecimal, # is ltieral number
 public enum AddressingMode {
 
     ACCUMULATOR("A") {
@@ -28,23 +29,23 @@ public enum AddressingMode {
             return cpu.getState().regPc;
         }
     },
-    ABSOLUTE("$~1~2") {
+    ABSOLUTE("~1~2") {
         @Override
         public int obtainAddress(Cpu cpu) {
             return MemoryUtils.programPop2(cpu.getBus(), cpu.getState());
         }
     },
-    ZERO_PAGE("$~1") {
+    ZERO_PAGE("~1 (zp)") {
         @Override
         public int obtainAddress(Cpu cpu) {
             return MemoryUtils.programPop1(cpu.getBus(), cpu.getState());
         }
     },
-    RELATIVE("*+~1") {
+    RELATIVE("*~1") {
         @Override
         public int obtainAddress(Cpu cpu) {
-            int value = (MemoryUtils.programPop1(cpu.getBus(), cpu.getState()) + cpu.getState().regPc) & 0xFFFF;
-            return MemoryUtils.signedByteToInt(value);
+            int offset = MemoryUtils.signedByteToInt(MemoryUtils.programPop1(cpu.getBus(), cpu.getState()));
+            return (cpu.getState().regPc + offset) & 0xFFFF;
         }
     };
 
