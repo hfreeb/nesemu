@@ -26,8 +26,8 @@ public class MemoryUtils {
     }
 
     public static void stackPush1(int value, MemoryBus bus, CpuState state) {
-        bus.write1(state.regS + 0x100, value);
-        state.regS = (state.regS - 1) & 0xFF;
+        bus.write1(state.regSp + 0x100, value);
+        state.regSp = (state.regSp - 1) & 0xFF;
     }
 
     public static void stackPush2(int value, MemoryBus bus, CpuState state) {
@@ -36,8 +36,8 @@ public class MemoryUtils {
     }
 
     public static int stackPop1(MemoryBus bus, CpuState state) {
-        state.regS = (state.regS + 1) & 0xFF;
-        return bus.read1(state.regS + 0x100);
+        state.regSp = (state.regSp + 1) & 0xFF;
+        return bus.read1(state.regSp + 0x100);
     }
 
     public static int stackPop2(MemoryBus bus, CpuState state) {

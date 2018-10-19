@@ -17,26 +17,41 @@ public enum Instruction {
 
         state.regA = result & 0xFF;
     }),
-    LDA(((cpu, mode) -> {
+    LDA((cpu, mode) -> {
         CpuState state = cpu.getState();
         int value = mode.read1(cpu);
         state.flagZ = value == 0;
         state.flagN = (value & 0b10000000) != 0;
         state.regA = value;
-    })),
-    CMP((cpu, mode) -> {
-        CpuState state = cpu.getState();
-        int value = mode.read1(cpu);
-        state.flagZ = state.regA == value;
-        state.flagC = state.regA >= value;
-        state.flagN = (value & 0b10000000) != 0;
     }),
+    STA(((cpu, mode) -> {
+        mode.write1(cpu, cpu.getState().regA);
+    })),
+    CMP(InstructionProcessor.compare(state -> state.regA)),
+    CPX(InstructionProcessor.compare(state -> state.regX)),
+    CPY(InstructionProcessor.compare(state -> state.regY)),
     BNE((cpu, mode) -> {
         if (!cpu.getState().flagZ) {
             cpu.getState().regPc = mode.obtainAddress(cpu);
         } else {
-            cpu.getState().regPc++; //Skip arg
+            cpu.getState().regPc = (cpu.getState().regPc + 1) & 0xFFFF; //Skip arg
         }
+    }),
+    LDX(InstructionProcessor.load((state, value) -> state.regX = value)),
+    LDY(InstructionProcessor.load((state, value) -> state.regY = value)),
+    INY((cpu, mode) -> {
+        CpuState state = cpu.getState();
+        int value = (state.regY + 1) & 0xFF;
+        state.flagZ = value == 0;
+        state.flagN = (value & 0b10000000) != 0;
+        state.regY = value;
+    }),
+    INX((cpu, mode) -> {
+        CpuState state = cpu.getState();
+        int value = (state.regX + 1) & 0xFF;
+        state.flagZ = value == 0;
+        state.flagN = (value & 0b10000000) != 0;
+        state.regX = value;
     });
 
     private final InstructionProcessor processor;

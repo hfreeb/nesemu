@@ -17,8 +17,8 @@ public enum AddressingMode {
             cpu.getState().regA = value;
         }
     },
-    IMPLIED(""),
-    IMMEDIATE("#~1") {
+    IMP(""),
+    IMM("#[1]") {
         @Override
         public int read1(Cpu cpu) {
             return MemoryUtils.programPop1(cpu.getBus(), cpu.getState());
@@ -29,19 +29,37 @@ public enum AddressingMode {
             return cpu.getState().regPc;
         }
     },
-    ABSOLUTE("~1~2") {
+    ABS("$[1,2]") {
         @Override
         public int obtainAddress(Cpu cpu) {
             return MemoryUtils.programPop2(cpu.getBus(), cpu.getState());
         }
     },
-    ZERO_PAGE("~1 (zp)") {
+    ABX("$[1,2],X") {
+        @Override
+        public int obtainAddress(Cpu cpu) {
+            return (MemoryUtils.programPop2(cpu.getBus(), cpu.getState()) + cpu.getState().regX) & 0xFFFF;
+        }
+    },
+    ZPG("$[1]") {
         @Override
         public int obtainAddress(Cpu cpu) {
             return MemoryUtils.programPop1(cpu.getBus(), cpu.getState());
         }
     },
-    RELATIVE("*~1") {
+    ZPX("$[1],X") {
+        @Override
+        public int obtainAddress(Cpu cpu) {
+            return (MemoryUtils.programPop1(cpu.getBus(), cpu.getState()) + cpu.getState().regX) & 0xFF;
+        }
+    },
+    ZPY("$[1],Y") {
+        @Override
+        public int obtainAddress(Cpu cpu) {
+            return (MemoryUtils.programPop1(cpu.getBus(), cpu.getState()) + cpu.getState().regY) & 0xFF;
+        }
+    },
+    REL("*[1]") {
         @Override
         public int obtainAddress(Cpu cpu) {
             int offset = MemoryUtils.signedByteToInt(MemoryUtils.programPop1(cpu.getBus(), cpu.getState()));
