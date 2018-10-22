@@ -1,11 +1,9 @@
 package com.harryfreeborough.nesemu.utils;
 
-/**
- * TODO: Desetude
- */
 public class Preconditions {
     
-    private Preconditions() {}
+    private Preconditions() {
+    }
     
     public static void checkState(boolean check, String format, Object... args) {
         if (!check) {

@@ -1,34 +1,44 @@
 package com.harryfreeborough.nesemu.instruction;
 
-import com.harryfreeborough.nesemu.Cpu;
 import com.harryfreeborough.nesemu.CpuState;
+import com.harryfreeborough.nesemu.device.MemoryBus;
+import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public interface InstructionProcessor {
-
-    void execute(Cpu cpu, AddressingMode mode);
-
+    
     static InstructionProcessor load(BiConsumer<CpuState, Integer> consumer) {
-        return (cpu, mode) -> {
-            CpuState state = cpu.getState();
-            int value = mode.read1(cpu);
-            state.flagZ = value == 0;
-            state.flagN = (value & 0b10000000) != 0;
+        return (bus, state, mode) -> {
+            int value = mode.read1(bus, state);
+            MemoryUtils.setNZFlags(state, value);
             consumer.accept(state, value);
         };
     }
-
+    
     static InstructionProcessor compare(Function<CpuState, Integer> function) {
-        return (cpu, mode) -> {
-            CpuState state = cpu.getState();
-            int value = mode.read1(cpu);
+        return (bus, state, mode) -> {
+            int value = mode.read1(bus, state);
             int register = function.apply(state);
             state.flagZ = register == value;
             state.flagC = register >= value;
-            state.flagN = (value & 0b10000000) != 0;
+            state.flagN = (value & 1 << 7) != 0;
         };
     }
-
+    
+    static InstructionProcessor branch(Predicate<CpuState> predicate) {
+        return (bus, state, mode ) -> {
+            if (predicate.test(state)) {
+                state.regPc = state.regMar;
+            } else {
+                state.regPc = state.regPc & 0xFFFF; //Skip arg
+            }
+        };
+    }
+    
+    void execute(MemoryBus bus, CpuState state, AddressingMode mode);
+    
 }

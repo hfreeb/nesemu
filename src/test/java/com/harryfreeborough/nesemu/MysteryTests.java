@@ -1,28 +1,13 @@
 package com.harryfreeborough.nesemu;
 
-import com.harryfreeborough.nesemu.devices.Memory;
+import com.harryfreeborough.nesemu.device.MemoryBus;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class Easy6502Tests {
-
-    private Cpu cpu;
-    private MemoryBus bus;
-    private CpuState store;
-
-    @Before
-    public void setup() {
-        this.bus = new MemoryBus();
-        this.store = new CpuState();
-        this.cpu = new Cpu(this.bus, this.store);
-
-        this.bus.addDevice(new Memory(0x0000, 0x0FFF, false));
-    }
-
+public class MysteryTests {
+    
     @Test
     public void loopTest() {
         /*
@@ -55,29 +40,55 @@ public class Easy6502Tests {
 
         System.out.println("65k iterations took " + (end - start) + " ms");*/
     }
-
+    
     @Test
     public void ourFirstProgram() {
         /*
         LDA #$01
         STA $0200
         LDA #$05
+        AND #$FE
         STA $0201
         LDA #$08
         STA $0202
          */
-        MemoryUtils.programWrite(this.bus, this.store,
+        Console console = new Console();
+        MemoryBus bus = console.getCpu().getBus();
+        
+        MemoryUtils.programWrite(bus, console.getCpu().getState(),
                 0xA9, 0x01,
                 0x8D, 0x00, 0x02,
                 0xA9, 0x05,
+                0x29, 0xFE,
                 0x8D, 0x01, 0x02,
                 0xA9, 0x08,
                 0x8D, 0x02, 0x02);
-
-        while (this.cpu.run()) ;
-        assertEquals(this.cpu.getBus().read1(0x0200), 1);
-        assertEquals(this.cpu.getBus().read1(0x0201), 5);
-        assertEquals(this.cpu.getBus().read1(0x0202), 8);
+        
+        while (console.getCpu().tick()) ;
+        assertEquals(1, bus.read1(0x0200));
+        assertEquals(4, bus.read1(0x0201));
+        assertEquals(8, bus.read1(0x0202));
     }
-
+    
+    @Test
+    public void memoryMirrorTest() {
+        /*
+        LDA #42
+        STA $0805
+         */
+        
+        Console console = new Console();
+        MemoryBus bus = console.getCpu().getBus();
+        
+        MemoryUtils.programWrite(bus, console.getCpu().getState(),
+                0xA9, 42,
+                0x8D, 0x05, 0x08);
+        
+        while (console.getCpu().tick());
+        assertEquals(42, bus.read1(0x0005));
+        assertEquals(42, bus.read1(0x0805));
+        assertEquals(42, bus.read1(0x1005));
+        assertEquals(42, bus.read1(0x1805));
+    }
+    
 }
