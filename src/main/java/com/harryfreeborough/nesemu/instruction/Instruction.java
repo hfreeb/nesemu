@@ -1,67 +1,81 @@
 package com.harryfreeborough.nesemu.instruction;
 
-import com.harryfreeborough.nesemu.CpuState;
+import com.harryfreeborough.nesemu.utils.MemoryUtils;
+
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.setNZFlags;
 
 public enum Instruction {
-
-    ADC((cpu, mode) -> {
-        CpuState state = cpu.getState();
-        int value = mode.read1(cpu);
+    
+    ADC((bus, state, mode) -> {
+        int value = mode.read1(bus, state);
         int result = state.regA + value + (state.flagC ? 1 : 0);
-
+        
         state.flagC = result >> 8 != 0;
         state.flagV = (((state.regA ^ value) & 0x80) == 0) &&
                 (((state.regA ^ result) & 0x80) != 0);
-        state.flagZ = result == 0;
-        state.flagN = (result & 0b10000000) != 0;
-
+        setNZFlags(state, result);
+        
         state.regA = result & 0xFF;
     }),
-    LDA((cpu, mode) -> {
-        CpuState state = cpu.getState();
-        int value = mode.read1(cpu);
-        state.flagZ = value == 0;
-        state.flagN = (value & 0b10000000) != 0;
-        state.regA = value;
-    }),
-    STA(((cpu, mode) -> {
-        mode.write1(cpu, cpu.getState().regA);
-    })),
+    AND((bus, state, mode) -> state.regA &= setNZFlags(state, mode.read1(bus, state))),
+    LDA((bus, state, mode) -> state.regA = setNZFlags(state, mode.read1(bus, state))),
+    STA((bus, state, mode) -> mode.write1(bus, state, state.regA)),
     CMP(InstructionProcessor.compare(state -> state.regA)),
     CPX(InstructionProcessor.compare(state -> state.regX)),
     CPY(InstructionProcessor.compare(state -> state.regY)),
-    BNE((cpu, mode) -> {
-        if (!cpu.getState().flagZ) {
-            cpu.getState().regPc = mode.obtainAddress(cpu);
-        } else {
-            cpu.getState().regPc = (cpu.getState().regPc + 1) & 0xFFFF; //Skip arg
-        }
-    }),
+    
+    BNE(InstructionProcessor.branch(state -> !state.flagZ)),
+    BEQ(InstructionProcessor.branch(state -> state.flagZ)),
+    BPL(InstructionProcessor.branch(state -> !state.flagN)),
+    BCS(InstructionProcessor.branch(state -> state.flagC)),
+    BCC(InstructionProcessor.branch(state -> !state.flagC)),
+    
     LDX(InstructionProcessor.load((state, value) -> state.regX = value)),
     LDY(InstructionProcessor.load((state, value) -> state.regY = value)),
-    INY((cpu, mode) -> {
-        CpuState state = cpu.getState();
-        int value = (state.regY + 1) & 0xFF;
-        state.flagZ = value == 0;
-        state.flagN = (value & 0b10000000) != 0;
-        state.regY = value;
+    INY((bus, state, mode) -> state.regY = setNZFlags(state, (state.regY + 1) & 0xFF)),
+    INX((bus, state, mode) -> state.regX = setNZFlags(state, (state.regX + 1) & 0xFF)),
+    INC((bus, state, mode) -> mode.write1(bus, state, setNZFlags(state, (mode.read1(bus, state) + 1) & 0xFF))),
+    JSR((bus, state, mode) -> {
+        MemoryUtils.stackPush2(state.regPc - 1, bus, state);
+        state.regPc = state.regMar;
     }),
-    INX((cpu, mode) -> {
-        CpuState state = cpu.getState();
-        int value = (state.regX + 1) & 0xFF;
-        state.flagZ = value == 0;
-        state.flagN = (value & 0b10000000) != 0;
-        state.regX = value;
-    });
-
+    RTS((bus, state, mode) -> state.regPc = MemoryUtils.stackPop2(bus, state) + 1 ),
+    CLC((bus, state, mode) -> state.flagC = false),
+    BIT((bus, state, mode) -> {
+        int value = mode.read1(bus, state);
+        state.flagZ = (value & state.regA) == 0;
+        state.flagV = (value & (1 << 6)) != 0;
+        state.flagN = (value & (1 << 7)) != 0;
+    }),
+    DEX((bus, state, mode) -> state.regX = setNZFlags(state, (state.regX - 1) & 0xFF)),
+    DEC((bus, state, mode) -> mode.write1(bus, state, setNZFlags(state, (mode.read1(bus, state) - 1) & 0xFF))),
+    TXA((bus, state, mode) -> state.regA = setNZFlags(state, state.regX)),
+    LSR((bus, state, mode) -> {
+        int old = mode.read1(bus, state);
+        state.flagC = (old & 1) == 1;
+        mode.write1(bus, state, setNZFlags(state, old >> 1));
+    }),
+    ASL((bus, state, mode) -> {
+        int old = mode.read1(bus, state);
+        int result = (old << 1) & 0xFF;
+        
+        state.flagC = (old & (1 << 7)) != 0;
+        state.flagZ = state.regA == 0; //TODO: Check this, it seems a bit odd
+        state.flagN = (result & (1 << 7)) != 0;
+        
+        mode.write1(bus, state, result);
+    }),
+    
+    NOP((bus, state, mode) -> {});
+    
     private final InstructionProcessor processor;
-
+    
     Instruction(InstructionProcessor processor) {
         this.processor = processor;
     }
-
+    
     public InstructionProcessor getProcessor() {
         return processor;
     }
-
+    
 }
