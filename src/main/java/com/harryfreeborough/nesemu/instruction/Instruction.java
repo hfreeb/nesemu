@@ -30,7 +30,7 @@ public enum Instruction {
     
         state.regA = result & 0xFF;
     }),
-    AND((bus, state, mode) -> state.regA &= setNZFlags(state, mode.read1(bus, state))),
+    AND((bus, state, mode) -> state.regA = setNZFlags(state, state.regA & mode.read1(bus, state))),
     LDA((bus, state, mode) -> state.regA = setNZFlags(state, mode.read1(bus, state))),
     STA((bus, state, mode) -> mode.write1(bus, state, state.regA)),
     CMP(InstructionProcessor.compare(state -> state.regA)),
@@ -79,6 +79,8 @@ public enum Instruction {
         
         mode.write1(bus, state, result);
     }),
+    PHA((bus, state, mode) -> MemoryUtils.stackPush1(state.regA, bus, state)),
+    PLA((bus, state, mode) -> state.regA = MemoryUtils.setNZFlags(state, MemoryUtils.stackPop1(bus, state))),
     JMP((bus, state, mode) -> state.regPc = state.regMar),
     NOP((bus, state, mode) -> {});
     

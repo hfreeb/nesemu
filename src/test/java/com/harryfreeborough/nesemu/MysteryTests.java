@@ -98,20 +98,16 @@ public class MysteryTests {
         Console console = new Console();
         MemoryBus bus = console.getCpu().getBus();
     
-        //Set 0x10
-        bus.write1(0x10, 0x15);
-        bus.write1(0x11, 0x04);
-        bus.write1(0x02, 0x01);
-        MemoryUtils.programWrite(bus, console.getCpu().getState(),
-                0xA5, 0x02,
-                0x4A,
-                0xB0, 1,
-                0,
-                0xA5, 0x10,
-                0x38,
-                0xE9, 0x20);
+        for (int i = 0; i < 16; i++) {
+            MemoryUtils.programWrite(bus, console.getCpu().getState(),
+                    Operation.LDA_ZPG.getOpcode(), 0xFE,
+                    Operation.PHA_IMP.getOpcode(),
+                    Operation.AND_IMM.getOpcode(), 0x0F,
+                    Operation.PLA_IMP.getOpcode(),
+                    Operation.BEQ_REL.getOpcode(), -8);
     
-        while (console.getCpu().tick());
+            while (console.getCpu().tick()) ;
+        }
     }
     
     @Test
