@@ -14,6 +14,15 @@ public enum Operation {
     ADC_IDX(0x61, ADC, IDX, 6),
     ADC_IDY(0x71, ADC, IDY, 5),
     
+    SBC_IMM(0xE9, SBC, IMM, 2),
+    SBC_ZPG(0xE5, SBC, ZPG, 3),
+    SBC_ZPX(0xF5, SBC, ZPX, 4),
+    SBC_ABS(0xED, SBC, ABS, 4),
+    SBC_ABX(0xFD, SBC, ABX, 4),
+    SBC_ABY(0xF9, SBC, ABY, 4),
+    SBC_IDX(0xE1, SBC, IDX, 6),
+    SBC_IDY(0xF1, SBC, IDY, 5),
+    
     AND_IMM(0x29, AND, IMM, 2),
     AND_ZPG(0x25, AND, ZPG, 3),
     AND_ZPX(0x35, AND, ZPX, 4),
@@ -99,9 +108,13 @@ public enum Operation {
     INC_ABS(0xEE, INC, ABS, 6),
     INC_ABX(0xFE, INC, ABX, 7),
     
+    JMP_ABS(0x4C, JMP, ABS, 3),
+    JMP_IND(0x6C, JMP, IND, 5),
+    
     JSR_ABS(0x20, JSR, ABS, 6),
     RTS_IMP(0x60, RTS, IMP, 6),
     CLC_IMP(0x18, CLC, IMP, 2),
+    SEC_IMP(0x38, CLC, IMP, 2),
     BIT_ZPG(0x24, BIT, ZPG, 3),
     BIT_ABS(0x2C, BIT, ABS, 4),
     TXA_IMP(0x8A, TXA, IMP, 2),
