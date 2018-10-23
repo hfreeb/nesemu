@@ -1,6 +1,7 @@
 package com.harryfreeborough.nesemu;
 
 import com.harryfreeborough.nesemu.device.MemoryBus;
+import com.harryfreeborough.nesemu.instruction.Operation;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 import org.junit.Test;
 
@@ -89,6 +90,43 @@ public class MysteryTests {
         assertEquals(42, bus.read1(0x0805));
         assertEquals(42, bus.read1(0x1005));
         assertEquals(42, bus.read1(0x1805));
+    }
+    
+    @Test
+    public void snakeTest() {
+        //Test for debugging snake game
+        Console console = new Console();
+        MemoryBus bus = console.getCpu().getBus();
+    
+        //Set 0x10
+        bus.write1(0x10, 0x15);
+        bus.write1(0x11, 0x04);
+        bus.write1(0x02, 0x01);
+        MemoryUtils.programWrite(bus, console.getCpu().getState(),
+                0xA5, 0x02,
+                0x4A,
+                0xB0, 1,
+                0,
+                0xA5, 0x10,
+                0x38,
+                0xE9, 0x20);
+    
+        while (console.getCpu().tick());
+    }
+    
+    @Test
+    public void sbcTest() {
+        //Test for debugging snake game
+        Console console = new Console();
+        MemoryBus bus = console.getCpu().getBus();
+    
+        bus.write1(0x02, 0x01);
+        MemoryUtils.programWrite(bus, console.getCpu().getState(),
+                Operation.LDA_IMM.getOpcode(), 5,
+                Operation.SBC_IMM.getOpcode(), 6);
+    
+        while (console.getCpu().tick());
+        assertEquals(0xFF, console.getCpu().getState().regA);
     }
     
 }

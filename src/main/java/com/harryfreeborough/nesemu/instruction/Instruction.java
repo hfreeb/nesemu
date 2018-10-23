@@ -10,11 +10,24 @@ public enum Instruction {
         int value = mode.read1(bus, state);
         int result = state.regA + value + (state.flagC ? 1 : 0);
         
-        state.flagC = result >> 8 != 0;
+        state.flagC = (result >> 8) != 0;
         state.flagV = (((state.regA ^ value) & 0x80) == 0) &&
                 (((state.regA ^ result) & 0x80) != 0);
         setNZFlags(state, result);
         
+        state.regA = result & 0xFF;
+    }),
+    SBC((bus, state, mode) -> {
+        //TODO: Check?
+        int value = mode.read1(bus, state);
+        int result = state.regA - value + (state.flagC ? 1 : 0);
+    
+        state.flagC = (result >> 8) == 0;
+        state.flagV = ((state.regA ^ result) & (value ^ result) & 0x80) == 0x80;
+        state.flagV = (((state.regA ^ value) & 0x80) == 0) &&
+                (((state.regA ^ result) & 0x80) != 0);
+        setNZFlags(state, result);
+    
         state.regA = result & 0xFF;
     }),
     AND((bus, state, mode) -> state.regA &= setNZFlags(state, mode.read1(bus, state))),
@@ -41,6 +54,7 @@ public enum Instruction {
     }),
     RTS((bus, state, mode) -> state.regPc = MemoryUtils.stackPop2(bus, state) + 1 ),
     CLC((bus, state, mode) -> state.flagC = false),
+    SEC((bus, state, mode) -> state.flagC = true),
     BIT((bus, state, mode) -> {
         int value = mode.read1(bus, state);
         state.flagZ = (value & state.regA) == 0;
@@ -65,7 +79,7 @@ public enum Instruction {
         
         mode.write1(bus, state, result);
     }),
-    
+    JMP((bus, state, mode) -> state.regPc = state.regMar),
     NOP((bus, state, mode) -> {});
     
     private final InstructionProcessor processor;

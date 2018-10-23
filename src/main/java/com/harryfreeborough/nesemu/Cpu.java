@@ -21,15 +21,25 @@ public class Cpu {
     }
     
     public boolean tick() {
+        int sleeping = state.cycles / 30;
         try {
-            Thread.sleep(state.cycles * 5);
+            Thread.sleep(sleeping);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        state.cycles = 0;
+        state.cycles -= sleeping * 30;
     
-        System.out.println(String.format("A: $%02X, X: $%02X, Y: $%02X, S: $%02X, PC: $%04X",
-                state.regA, state.regX, state.regY, state.regSp, state.regPc));
+        System.out.println(String.format("A: $%02X, X: $%02X, Y: $%02X, S: $%02X, PC: $%04X, " +
+                        "C: %b, N: %b, Z: %b, V: %b",
+                state.regA, state.regX, state.regY, state.regSp, state.regPc,
+                state.flagC, state.flagN, state.flagZ, state.flagV));
+        for (int j = 0; j < 2; j++) {
+            System.out.print(String.format("%04X: ", j));
+            for (int k = 0; k < 16; k++) {
+                System.out.print(String.format("%02X ", this.bus.read1(j * 16 + k)));
+            }
+            System.out.println();
+        }
         
         int opcode = MemoryUtils.programPop1(this.bus, this.state);
         

@@ -37,7 +37,7 @@ public class Easy6502 {
                         "0700: 01 60 e6 11 a9 06 c5 11 f0 0c 60 c6 10 a5 10 29 \n" +
                         "0710: 1f c9 1f f0 01 60 4c 35 07 a0 00 a5 fe 91 00 60 \n" +
                         "0720: a6 03 a9 00 81 10 a2 00 a9 01 81 10 60 a2 00 ea \n" +
-                        "0730: ea ca d0 fb 60";
+                        "0730: ea ca d0 fb 60 ";
         
         List<Integer> instructions = new ArrayList<>();
         
