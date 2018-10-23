@@ -108,6 +108,9 @@ public enum Operation {
     INC_ABS(0xEE, INC, ABS, 6),
     INC_ABX(0xFE, INC, ABX, 7),
     
+    PHA_IMP(0x48, PHA, IMP, 3),
+    PLA_IMP(0x68, PLA, IMP, 4),
+    
     JMP_ABS(0x4C, JMP, ABS, 3),
     JMP_IND(0x6C, JMP, IND, 5),
     

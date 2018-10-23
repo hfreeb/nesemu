@@ -22,7 +22,7 @@ public class EasyPanel extends JPanel {
         
         for (int x = 0; x < 32; x++) {
             for (int y = 0; y < 32; y++) {
-                switch (this.bus.read1(0x200 + y * 32 + x) % 0x0D) {
+                switch (this.bus.read1(0x200 + y * 32 + x) % 0x10) {
                     case 0x00:
                         g.setColor(Color.BLACK);
                         break;
@@ -62,8 +62,13 @@ public class EasyPanel extends JPanel {
                     case 0x0C:
                         g.setColor(Color.BLUE);
                         break;
-                    default:
-                        g.setColor(Color.BLACK);
+                    case 0x0D:
+                        g.setColor(new Color(153, 0, 76));
+                    case 0x0E:
+                        g.setColor(new Color(51, 255, 255));
+                        break;
+                    case 0x0F:
+                        g.setColor(new Color(153, 153, 0));
                         break;
                 }
                 
