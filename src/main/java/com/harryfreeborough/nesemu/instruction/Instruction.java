@@ -18,7 +18,6 @@ public enum Instruction {
         state.regA = result & 0xFF;
     }),
     SBC((bus, state, mode) -> {
-        //TODO: Check?
         int value = mode.read1(bus, state);
         int result = state.regA - value + (state.flagC ? 1 : 0);
     
