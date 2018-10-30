@@ -16,7 +16,7 @@ public class EasyFrame extends JFrame implements KeyListener {
     public EasyFrame(MemoryBus memoryBus) {
         this.memoryBus = memoryBus;
         
-        setMinimumSize(new Dimension(640, 640));
+        setMinimumSize(new Dimension(650, 665));
         JPanel panel = new EasyPanel(memoryBus);
         getContentPane().add(panel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

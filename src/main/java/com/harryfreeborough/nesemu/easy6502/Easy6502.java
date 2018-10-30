@@ -41,13 +41,11 @@ public class Easy6502 {
         
         List<Integer> instructions = new ArrayList<>();
         
-        int n = 0;
         for (String line : hexdump.split("\n")) {
             line = line.substring(6, line.length() - 1);
             for (String instruction : line.split(" ")) {
                 int opcode = Integer.parseUnsignedInt(instruction, 16);
                 instructions.add(opcode);
-                n++;
             }
         }
         

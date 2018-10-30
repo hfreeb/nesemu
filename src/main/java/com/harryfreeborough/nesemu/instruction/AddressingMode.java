@@ -4,7 +4,6 @@ import com.harryfreeborough.nesemu.CpuState;
 import com.harryfreeborough.nesemu.device.MemoryBus;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
-//TODO: $ prefix should be hexadecimal, # is ltieral number
 public enum AddressingMode {
     
     ACC("A") {
