@@ -18,6 +18,8 @@ public class Cpu {
     public Cpu(MemoryBus bus, CpuState state) {
         this.bus = bus;
         this.state = state;
+        
+        reset();
     }
     
     public boolean tick() {
@@ -39,7 +41,7 @@ public class Cpu {
                 System.out.print(String.format("%02X ", this.bus.read1(j * 16 + k)));
             }
             System.out.println();
-        } */
+        }*/
         
         int opcode = MemoryUtils.programPop1(this.bus, this.state);
         
@@ -58,7 +60,7 @@ public class Cpu {
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
         
-        /*int arg1 = this.bus.read1(this.state.regPc);
+        int arg1 = this.bus.read1(this.state.regPc);
         int arg2 = this.bus.read1(this.state.regPc + 1);
         
         String format = mode.getFormat()
@@ -66,13 +68,27 @@ public class Cpu {
                 .replace("$[1]", String.format("$%02X", arg1))
                 .replace("[1]", String.format("%d", MemoryUtils.signedByteToInt(arg1)));
         
-        System.out.println(String.format("Processing %s %s", instruction.name(), format));*/
+        System.out.println(String.format("Processing %s %s", instruction.name(), format));
         
         this.state.regMar = mode.obtainAddress(this.bus, this.state);
         instruction.getProcessor().execute(this.bus, this.state, mode);
         this.state.cycles += operation.getCycles();
         
         return true;
+    }
+    
+    public void reset() {
+        this.state.regPc = this.bus.read2(0xFFFC);
+        this.state.regSp = 0xFD;
+        
+        this.state.flagC = false;
+        this.state.flagZ = false;
+        this.state.flagI = true;
+        this.state.flagD = false;
+        this.state.flagB = false;
+        this.state.flagU = true;
+        this.state.flagV = false;
+        this.state.flagN = false;
     }
     
     public MemoryBus getBus() {

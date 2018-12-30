@@ -1,36 +1,29 @@
 package com.harryfreeborough.nesemu.device;
 
-import com.harryfreeborough.nesemu.easy6502.EasyFrame;
 import com.harryfreeborough.nesemu.exceptions.BusException;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Memory implements Device {
     
-    private final int length;
     private final boolean readOnly;
     private final byte[] data;
     
     public Memory(int length, boolean readOnly) {
-        this.length = length;
-        this.readOnly = readOnly;
         this.data = new byte[length];
+        this.readOnly = readOnly;
+    }
+    
+    public Memory(byte[] data, boolean readOnly) {
+        this.data = data;
+        this.readOnly = readOnly;
     }
     
     @Override
     public int getLength() {
-        return this.length;
+        return this.data.length;
     }
     
     @Override
     public int read(int address) {
-        //TODO: Remove
-        if (address == 0xFE) { //Temporary, for Easy6502
-            return ThreadLocalRandom.current().nextInt(0, 256);
-        } else if (address == 0xFF) {
-            return EasyFrame.lastKey;
-        }
-        
         return this.data[address];
     }
     

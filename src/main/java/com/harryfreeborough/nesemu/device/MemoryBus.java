@@ -30,15 +30,12 @@ public class MemoryBus {
         this.devices.add(new RegisteredDevice(device, startAddress));
     }
     
-    public Optional<RegisteredDevice> getMemoryHolderOpt(int address) {
+    public RegisteredDevice getMemoryHolder(int address) {
+        //TODO: Better search
         return this.devices.stream()
                 .filter(device -> address >= device.getStartAddress() &&
                         address < (device.getStartAddress() + device.getDevice().getLength()))
-                .findAny();
-    }
-    
-    public RegisteredDevice getMemoryHolder(int address) {
-        return getMemoryHolderOpt(address)
+                .findAny()
                 .orElseThrow(() -> new BusException("Failed to get memory holder of address: $%04X", address));
     }
     
