@@ -114,10 +114,15 @@ public enum Operation {
     JMP_ABS(0x4C, JMP, ABS, 3),
     JMP_IND(0x6C, JMP, IND, 5),
     
+    CLC_IMP(0x18, CLC, IMP, 2),
+    SEC_IMP(0x38, SEC, IMP, 2),
+    CLI_IMP(0x58, CLI, IMP, 2),
+    SEI_IMP(0x78, SEI, IMP, 2),
+    CLV_IMP(0xB8, CLV, IMP, 2),
+    CLD_IMP(0xD8, CLD, IMP, 2),
+    
     JSR_ABS(0x20, JSR, ABS, 6),
     RTS_IMP(0x60, RTS, IMP, 6),
-    CLC_IMP(0x18, CLC, IMP, 2),
-    SEC_IMP(0x38, CLC, IMP, 2),
     BIT_ZPG(0x24, BIT, ZPG, 3),
     BIT_ABS(0x2C, BIT, ABS, 4),
     TXA_IMP(0x8A, TXA, IMP, 2),

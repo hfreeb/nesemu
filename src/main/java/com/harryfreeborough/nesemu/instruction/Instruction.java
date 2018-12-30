@@ -54,6 +54,10 @@ public enum Instruction {
     RTS((bus, state, mode) -> state.regPc = MemoryUtils.stackPop2(bus, state) + 1 ),
     CLC((bus, state, mode) -> state.flagC = false),
     SEC((bus, state, mode) -> state.flagC = true),
+    CLI((bus, state, mode) -> state.flagI = false),
+    SEI((bus, state, mode) -> state.flagI = true),
+    CLV((bus, state, mode) -> state.flagV = false),
+    CLD((bus, state, mode) -> state.flagD = false),
     BIT((bus, state, mode) -> {
         int value = mode.read1(bus, state);
         state.flagZ = (value & state.regA) == 0;
