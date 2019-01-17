@@ -126,6 +126,7 @@ public enum Operation {
     BIT_ZPG(0x24, BIT, ZPG, 3),
     BIT_ABS(0x2C, BIT, ABS, 4),
     TXA_IMP(0x8A, TXA, IMP, 2),
+    TXS_IMP(0x9A, TXS, IMP, 2),
     NOP_IMP(0xEA, NOP, IMP, 2);
     
     private final int opcode;
