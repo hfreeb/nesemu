@@ -67,6 +67,7 @@ public enum Instruction {
     DEX((bus, state, mode) -> state.regX = setNZFlags(state, (state.regX - 1) & 0xFF)),
     DEC((bus, state, mode) -> mode.write1(bus, state, setNZFlags(state, (mode.read1(bus, state) - 1) & 0xFF))),
     TXA((bus, state, mode) -> state.regA = setNZFlags(state, state.regX)),
+    TXS(((bus, state, mode) -> state.regSp = state.regX)),
     LSR((bus, state, mode) -> {
         int old = mode.read1(bus, state);
         state.flagC = (old & 1) == 1;
