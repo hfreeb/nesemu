@@ -4,7 +4,13 @@ public class Preconditions {
     
     private Preconditions() {
     }
-    
+
+    public static void checkArgument(boolean check, String format, Object... args) {
+        if (!check) {
+            throw new IllegalArgumentException(String.format(format, args));
+        }
+    }
+
     public static void checkState(boolean check, String format, Object... args) {
         if (!check) {
             throw new IllegalStateException(String.format(format, args));
