@@ -5,12 +5,23 @@ import com.harryfreeborough.nesemu.instruction.AddressingMode;
 import com.harryfreeborough.nesemu.instruction.Instruction;
 import com.harryfreeborough.nesemu.instruction.Operation;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
+import com.harryfreeborough.nesemu.utils.Preconditions;
 
 import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Cpu {
     
-    public static boolean running = true;
+    private static Map<Integer, Operation> operations;
+    
+    static {
+        operations = new HashMap<>();
+        for (Operation operation : Operation.values()) {
+            operations.put(operation.getOpcode(), operation);
+        }
+    }
     
     private final MemoryBus bus;
     private final CpuState state;
@@ -47,16 +58,12 @@ public class Cpu {
         
         if (opcode == 0) {
             System.out.println("HALTING");
-            running = false;
             return false;
         }
         
-        Operation operation = Arrays.stream(Operation.values())
-                .filter(i -> i.getOpcode() == opcode)
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException(
-                        String.format("Failed to find instruction with opcode: $%02X", opcode)
-                ));
+        Operation operation = operations.get(opcode);
+        Preconditions.checkNotNull(operation, "Failed to find instruction with id: $%02X", opcode);
+        
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
         
