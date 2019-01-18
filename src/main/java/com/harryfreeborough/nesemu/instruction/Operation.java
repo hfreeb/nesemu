@@ -32,6 +32,21 @@ public enum Operation {
     AND_IDX(0x21, AND, IDX, 6),
     AND_IDY(0x31, AND, IDY, 5),
     
+    EOR_IMM(0x49, EOR, IMM, 2),
+    EOR_ZPG(0x45, EOR, ZPG, 3),
+    EOR_ZPX(0x55, EOR, ZPX, 4),
+    EOR_ABS(0x4D, EOR, ABS, 4),
+    EOR_ABX(0x5D, EOR, ABX, 4),
+    EOR_ABY(0x59, EOR, ABY, 4),
+    EOR_IDX(0x41, EOR, IDX, 6),
+    EOR_IDY(0x51, EOR, IDY, 5),
+    
+    ROR_ACC(0x6A, ROR, ACC, 2),
+    ROR_ZPG(0x66, ROR, ZPG, 5),
+    ROR_ZPX(0x76, ROR, ZPX, 6),
+    ROR_ABS(0x6E, ROR, ABS, 6),
+    ROR_ABX(0x7E, ROR, ABX, 7),
+    
     LDA_IMM(0xA9, LDA, IMM, 2),
     LDA_ZPG(0xA5, LDA, ZPG, 3),
     LDA_ZPX(0xB5, LDA, ZPX, 4),
@@ -60,6 +75,7 @@ public enum Operation {
     ASL_ABX(0x1E, ASL, ABX, 7),
     
     DEX_IMP(0xCA, DEX, IMP, 2),
+    DEY_IMP(0x88, DEY, IMP, 2),
     DEC_ZPG(0xC6, DEC, ZPG, 5),
     DEC_ZPX(0xD6, DEC, ZPX, 6),
     DEC_ABS(0xCE, DEC, ABS, 6),
@@ -88,6 +104,14 @@ public enum Operation {
     STA_ABY(0x99, STA, ABY, 5),
     STA_IDX(0x81, STA, IDX, 6),
     STA_IDY(0x91, STA, IDY, 6),
+    
+    STX_ZPG(0x86, STX, ZPG, 3),
+    STX_ZPY(0x96, STX, ZPY, 4),
+    STX_ABS(0x8E, STX, ABS, 4),
+    
+    STY_ZPG(0x84, STY, ZPG, 3),
+    STY_ZPX(0x94, STY, ZPX, 4),
+    STY_ABS(0x8C, STY, ABS, 4),
     
     LDX_IMM(0xA2, LDX, IMM, 2),
     LDX_ZPG(0xA6, LDX, ZPG, 3),
@@ -125,7 +149,10 @@ public enum Operation {
     RTS_IMP(0x60, RTS, IMP, 6),
     BIT_ZPG(0x24, BIT, ZPG, 3),
     BIT_ABS(0x2C, BIT, ABS, 4),
+    TAX_IMP(0xAA, TAX, IMP, 2),
+    TAY_IMP(0xA8, TAY, IMP, 2),
     TXA_IMP(0x8A, TXA, IMP, 2),
+    TYA_IMP(0x98, TYA, IMP, 2),
     TXS_IMP(0x9A, TXS, IMP, 2),
     NOP_IMP(0xEA, NOP, IMP, 2);
     

@@ -20,18 +20,27 @@ public enum Instruction {
     SBC((bus, state, mode) -> {
         int value = mode.read1(bus, state);
         int result = state.regA - value + (state.flagC ? 1 : 0);
-    
+        
         state.flagC = (result >> 8) == 0;
         state.flagV = ((state.regA ^ result) & (value ^ result) & 0x80) == 0x80;
         state.flagV = (((state.regA ^ value) & 0x80) == 0) &&
                 (((state.regA ^ result) & 0x80) != 0);
         setNZFlags(state, result);
-    
+        
         state.regA = result & 0xFF;
     }),
     AND((bus, state, mode) -> state.regA = setNZFlags(state, state.regA & mode.read1(bus, state))),
+    EOR((bus, state, mode) -> state.regA = setNZFlags(state, state.regA ^ mode.read1(bus, state))),
+    ROR((bus, state, mode) -> {
+        int value = mode.read1(bus, state);
+        int carry = (state.flagC ? 1 : 0) << 7;
+        state.flagC = (value & 0x01) == 0x01;
+        state.regA = setNZFlags(state, carry | (value >> 1));
+    }),
     LDA((bus, state, mode) -> state.regA = setNZFlags(state, mode.read1(bus, state))),
     STA((bus, state, mode) -> mode.write1(bus, state, state.regA)),
+    STX((bus, state, mode) -> mode.write1(bus, state, state.regX)),
+    STY((bus, state, mode) -> mode.write1(bus, state, state.regY)),
     CMP(InstructionProcessor.compare(state -> state.regA)),
     CPX(InstructionProcessor.compare(state -> state.regX)),
     CPY(InstructionProcessor.compare(state -> state.regY)),
@@ -51,7 +60,7 @@ public enum Instruction {
         MemoryUtils.stackPush2(state.regPc - 1, bus, state);
         state.regPc = state.regMar;
     }),
-    RTS((bus, state, mode) -> state.regPc = MemoryUtils.stackPop2(bus, state) + 1 ),
+    RTS((bus, state, mode) -> state.regPc = MemoryUtils.stackPop2(bus, state) + 1),
     CLC((bus, state, mode) -> state.flagC = false),
     SEC((bus, state, mode) -> state.flagC = true),
     CLI((bus, state, mode) -> state.flagI = false),
@@ -65,8 +74,12 @@ public enum Instruction {
         state.flagN = (value & (1 << 7)) != 0;
     }),
     DEX((bus, state, mode) -> state.regX = setNZFlags(state, (state.regX - 1) & 0xFF)),
+    DEY((bus, state, mode) -> state.regY = setNZFlags(state, (state.regY - 1) & 0xFF)),
     DEC((bus, state, mode) -> mode.write1(bus, state, setNZFlags(state, (mode.read1(bus, state) - 1) & 0xFF))),
+    TAX((bus, state, mode) -> state.regX = setNZFlags(state, state.regA)),
+    TAY((bus, state, mode) -> state.regY = setNZFlags(state, state.regA)),
     TXA((bus, state, mode) -> state.regA = setNZFlags(state, state.regX)),
+    TYA((bus, state, mode) -> state.regA = setNZFlags(state, state.regY)),
     TXS(((bus, state, mode) -> state.regSp = state.regX)),
     LSR((bus, state, mode) -> {
         int old = mode.read1(bus, state);
@@ -86,7 +99,7 @@ public enum Instruction {
     PHA((bus, state, mode) -> MemoryUtils.stackPush1(state.regA, bus, state)),
     PLA((bus, state, mode) -> state.regA = MemoryUtils.setNZFlags(state, MemoryUtils.stackPop1(bus, state))),
     JMP((bus, state, mode) -> state.regPc = state.regMar),
-    NOP((bus, state, mode) -> {});
+    NOP((bus, state, mode) -> { /* NOP */ });
     
     private final InstructionProcessor processor;
     
