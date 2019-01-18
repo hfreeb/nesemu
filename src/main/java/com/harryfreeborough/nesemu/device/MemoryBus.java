@@ -1,6 +1,7 @@
 package com.harryfreeborough.nesemu.device;
 
 import com.harryfreeborough.nesemu.exceptions.BusException;
+import com.harryfreeborough.nesemu.ppu.Ppu;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
 import java.util.NavigableSet;
@@ -8,65 +9,54 @@ import java.util.Optional;
 import java.util.TreeSet;
 
 public class MemoryBus {
-    
-    private final NavigableSet<RegisteredDevice> devices;
-    
-    public MemoryBus() {
-        this.devices = new TreeSet<>();
+
+    private final Ppu ppu;
+    private final byte[] internalRam = new byte[0x800];
+
+    public MemoryBus(Ppu ppu) {
+        this.ppu = ppu;
     }
-    
-    public void registerDevice(Device device, int startAddress) {
-        int end = startAddress + device.getLength() - 1;
-        
-        for (RegisteredDevice other : this.devices) {
-            int otherStart = other.getStartAddress();
-            int otherEnd = other.getStartAddress() + other.getDevice().getLength() - 1;
-            
-            Preconditions.checkState((startAddress < otherStart && end < otherStart) || (startAddress > otherEnd),
-                    "Memory overlap between two devices: %04X with length %04X and %04X with length %04X",
-                    startAddress, device.getLength(), otherStart, other.getDevice().getLength());
-        }
-        
-        this.devices.add(new RegisteredDevice(device, startAddress));
-    }
-    
-    public RegisteredDevice getMemoryHolder(int address) {
-        //TODO: Better search
-        return this.devices.stream()
-                .filter(device -> address >= device.getStartAddress() &&
-                        address < (device.getStartAddress() + device.getDevice().getLength()))
-                .findAny()
-                .orElseThrow(() -> new BusException("Failed to get memory holder of address: $%04X", address));
-    }
-    
+
     public int read1(int address) {
+        Preconditions.checkArgument(address <= 0xFFFF, "Address out of range.");
         address &= 0xFFFF;
-        
-        RegisteredDevice device = getMemoryHolder(address);
-        return device.getDevice().read(address - device.getStartAddress()) & 0xFF;
+
+        if (address < 0x2000) {
+            return this.internalRam[address % 0x800];
+        } else if (address < 0x4000) {
+            return this.ppu.readRegister(0x2000 + (address % 8));
+        } else if (address < 0x4020) {
+            //APU and I/O registers
+        } else {
+            //Cartridge space
+        }
+
+        throw new IllegalStateException(String.format("Failed to read from address %02X", address));
     }
-    
     public int read2(int address) {
-        RegisteredDevice device = getMemoryHolder(address);
-        int relativeAddress = (address - device.getStartAddress()) & 0xFFFF;
-        int part1 = device.getDevice().read(relativeAddress) & 0xFF;
-        int part2 = ((device.getDevice().read(relativeAddress + 1) & 0xFF) << 8);
-        return part1 | part2;
+        return read1(address) | (read1(address + 1) << 8);
     }
     
     public void write1(int address, int value) {
-        RegisteredDevice device = getMemoryHolder(address);
-        
-        int relativeAddress = (address - device.getStartAddress()) & 0xFFFF;
-        device.getDevice().write(relativeAddress, value & 0xFF);
+        Preconditions.checkArgument(address <= 0xFFFF, "Address out of range.");
+        Preconditions.checkArgument(value <= 0xFF, "Value too large.");
+
+        if (address < 0x2000) {
+            this.internalRam[address % 0x800] = (byte) value;
+        } else if (address < 0x4000) {
+            this.ppu.writeRegister(0x2000 + (address % 8), value);
+        } else if (address < 0x4020) {
+            //APU and I/O registers
+        } else {
+            //Cartridge space
+        }
+
+        throw new IllegalStateException(String.format("Failed to write to address %02X", address));
     }
     
     public void write2(int address, int value) {
-        RegisteredDevice device = getMemoryHolder(address);
-        
-        int relativeAddress = (address - device.getStartAddress()) & 0xFFFF;
-        device.getDevice().write(relativeAddress, value & 0xFF);
-        device.getDevice().write(relativeAddress + 1, value >> 8);
+        write1(address, value & 0xFF);
+        write1(address, value >> 8);
     }
     
 }
