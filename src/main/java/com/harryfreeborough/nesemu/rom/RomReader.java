@@ -44,7 +44,8 @@ public class RomReader {
             byte[] chrRomData = reader.readBytes(0x2000 * chrRomSize);
             
             return Optional.of(
-                    new RomData(mirroringType, persistentMemory, mapperId, trainerData, prgRomData, chrRomData)
+                    new RomData(mirroringType, persistentMemory, mapperId, prgRomSize, chrRomSize,
+                                trainerData, prgRomData, chrRomData)
             );
         } catch (IOException e) {
             e.printStackTrace();

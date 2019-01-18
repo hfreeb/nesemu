@@ -1,7 +1,7 @@
 package com.harryfreeborough.nesemu.utils;
 
 import com.harryfreeborough.nesemu.CpuState;
-import com.harryfreeborough.nesemu.device.MemoryBus;
+import com.harryfreeborough.nesemu.MemoryBus;
 
 public class MemoryUtils {
     

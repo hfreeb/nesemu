@@ -1,11 +1,10 @@
 package com.harryfreeborough.nesemu.instruction;
 
 import com.harryfreeborough.nesemu.CpuState;
-import com.harryfreeborough.nesemu.device.MemoryBus;
+import com.harryfreeborough.nesemu.MemoryBus;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
 import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
