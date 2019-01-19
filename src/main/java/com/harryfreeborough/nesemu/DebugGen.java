@@ -1,25 +1,27 @@
 package com.harryfreeborough.nesemu;
 
+import com.harryfreeborough.nesemu.cpu.CpuMemory;
+import com.harryfreeborough.nesemu.cpu.CpuState;
 import com.harryfreeborough.nesemu.instruction.AddressingMode;
 import com.harryfreeborough.nesemu.instruction.Instruction;
 import com.harryfreeborough.nesemu.instruction.Operation;
 import com.harryfreeborough.nesemu.ppu.PpuState;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
-public class CpuDebug {
+public class DebugGen {
     
     private final CpuState cpuState;
     private final PpuState ppuState;
-    private final MemoryBus bus;
+    private final CpuMemory bus;
     
-    public CpuDebug(CpuState cpuState, PpuState ppuState, MemoryBus bus) {
+    public DebugGen(CpuState cpuState, PpuState ppuState, CpuMemory bus) {
         this.cpuState = cpuState;
         this.ppuState = ppuState;
         this.bus = bus;
     }
     
-    //TODO: Make this nicer
-    public void run(Operation operation) {
+    public String generate(Operation operation) {
+        //TODO: Clean this all up
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
         
@@ -37,7 +39,7 @@ public class CpuDebug {
                                  .replace("[1]", String.format("%d", MemoryUtils.signedByteToInt(arg)));
         }
     
-        //TODO: Create function to convert number to n long padded out hex
+        //TODO: Create function to convert number to n long padded out hex, should speed it up
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("%04X", this.cpuState.regPc));
         builder.append(" ");
@@ -80,7 +82,7 @@ public class CpuDebug {
         builder.append(this.cpuState.cycles / (114*260*60));
         builder.append("s)");
         
-        System.out.println(builder.toString());
+        return builder.toString();
     }
     
 }

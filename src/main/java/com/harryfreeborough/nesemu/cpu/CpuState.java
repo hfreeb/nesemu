@@ -1,6 +1,8 @@
-package com.harryfreeborough.nesemu;
+package com.harryfreeborough.nesemu.cpu;
 
 public class CpuState {
+    
+    public final byte[] internalRam = new byte[0x800];
     
     //CPU Cycles that need to be catched up on by other devices
     //(i.e. PPU, APU and controller processor, WE it is called /TODO)

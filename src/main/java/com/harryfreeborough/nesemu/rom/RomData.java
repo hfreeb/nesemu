@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public class RomData {
     
-    private final MirroringType mirroringType;
+    private final MirroringMode mirroringMode;
     private final boolean persistentMemory;
     private final int mapperId;
     private final int prgRomSize;
@@ -14,10 +14,10 @@ public class RomData {
     private final byte[] prgRomData;
     private final byte[] chrRomData;
     
-    RomData(MirroringType mirroringType, boolean persistentMemory,
-                int mapperId, int prgRomSize, int chrRomSize,
-                @Nullable byte[] trainerData, byte[] prgRomData, byte[] chrRomData) {
-        this.mirroringType = mirroringType;
+    RomData(MirroringMode mirroringMode, boolean persistentMemory,
+            int mapperId, int prgRomSize, int chrRomSize,
+            @Nullable byte[] trainerData, byte[] prgRomData, byte[] chrRomData) {
+        this.mirroringMode = mirroringMode;
         this.persistentMemory = persistentMemory;
         this.mapperId = mapperId;
         this.prgRomSize = prgRomSize;
@@ -27,8 +27,8 @@ public class RomData {
         this.chrRomData = chrRomData;
     }
     
-    public MirroringType getMirroringType() {
-        return this.mirroringType;
+    public MirroringMode getMirroringMode() {
+        return this.mirroringMode;
     }
     
     public boolean isPersistentMemory() {

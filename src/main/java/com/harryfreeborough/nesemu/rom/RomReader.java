@@ -21,11 +21,11 @@ public class RomReader {
             int prgRomSize = reader.readByte();
             int chrRomSize = reader.readByte();
             
-            MirroringType mirroringType = reader.readBoolean() ? MirroringType.VERTICAL : MirroringType.HORIZONTAL;
+            MirroringMode mirroringMode = reader.readBoolean() ? MirroringMode.VERTICAL : MirroringMode.HORIZONTAL;
             boolean persistentMemory = reader.readBoolean();
             boolean trainer = reader.readBoolean();
             if (reader.readBoolean()) {
-                mirroringType = MirroringType.FOUR_SCREEN;
+                mirroringMode = MirroringMode.FOUR_SCREEN;
             }
             int mapperId = reader.readBits(4);
             boolean vsUnisystem = reader.readBoolean();
@@ -44,7 +44,7 @@ public class RomReader {
             byte[] chrRomData = reader.readBytes(0x2000 * chrRomSize);
             
             return Optional.of(
-                    new RomData(mirroringType, persistentMemory, mapperId, prgRomSize, chrRomSize,
+                    new RomData(mirroringMode, persistentMemory, mapperId, prgRomSize, chrRomSize,
                                 trainerData, prgRomData, chrRomData)
             );
         } catch (IOException e) {

@@ -1,6 +1,6 @@
 package com.harryfreeborough.nesemu.rom;
 
-public enum MirroringType {
+public enum MirroringMode {
     
     HORIZONTAL,
     VERTICAL,
