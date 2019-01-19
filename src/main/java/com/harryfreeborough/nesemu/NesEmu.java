@@ -1,6 +1,10 @@
 package com.harryfreeborough.nesemu;
 
+import com.harryfreeborough.nesemu.cpu.Cpu;
+import com.harryfreeborough.nesemu.cpu.CpuMemory;
+import com.harryfreeborough.nesemu.cpu.CpuState;
 import com.harryfreeborough.nesemu.ppu.Ppu;
+import com.harryfreeborough.nesemu.ppu.PpuMemory;
 import com.harryfreeborough.nesemu.ppu.PpuState;
 import com.harryfreeborough.nesemu.rom.RomData;
 import com.harryfreeborough.nesemu.rom.RomReader;
@@ -24,11 +28,13 @@ public class NesEmu {
         Preconditions.checkState(data.getMapperId() == 0, "Only the NROM mapper is currently supported.");
     
         PpuState ppuState = new PpuState();
-        Ppu ppu = new Ppu(ppuState);
-        MemoryBus bus = new MemoryBus(ppu, data);
-
+        PpuMemory ppuMemory = new PpuMemory(ppuState, data);
+        Ppu ppu = new Ppu(ppuState, ppuMemory);
         CpuState cpuState = new CpuState();
-        CpuDebug debug = new CpuDebug(cpuState, ppuState, bus);
+        
+        CpuMemory bus = new CpuMemory(ppu, cpuState, data);
+
+        DebugGen debug = new DebugGen(cpuState, ppuState, bus);
         Cpu cpu = new Cpu(bus, cpuState, debug);
 
         while (cpu.tick()) {

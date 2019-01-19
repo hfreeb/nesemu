@@ -1,7 +1,7 @@
 package com.harryfreeborough.nesemu.instruction;
 
-import com.harryfreeborough.nesemu.CpuState;
-import com.harryfreeborough.nesemu.MemoryBus;
+import com.harryfreeborough.nesemu.cpu.CpuState;
+import com.harryfreeborough.nesemu.cpu.CpuMemory;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
 import java.util.function.BiConsumer;
@@ -38,6 +38,6 @@ public interface InstructionProcessor {
         };
     }
     
-    void execute(MemoryBus bus, CpuState state, AddressingMode mode);
+    void execute(CpuMemory bus, CpuState state, AddressingMode mode);
     
 }

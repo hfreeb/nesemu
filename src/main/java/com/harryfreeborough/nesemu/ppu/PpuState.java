@@ -2,6 +2,9 @@ package com.harryfreeborough.nesemu.ppu;
 
 public class PpuState {
     
+    public final byte[] nametableData = new byte[0x1000];
+    public final byte[] palleteData = new byte[0x20];
+    
     //The least 5 significant bits of the value last written into a register
     public int register;
     
@@ -24,6 +27,6 @@ public class PpuState {
     //$2002: PPUSTATUS
     public int flagSpriteOverflow;
     public int flagSpriteZeroHit;
-    public boolean flagNmiStarted;
+    public boolean flagNmiOccurred;
     
 }

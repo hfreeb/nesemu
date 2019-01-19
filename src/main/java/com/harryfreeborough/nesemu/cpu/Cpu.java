@@ -1,5 +1,7 @@
-package com.harryfreeborough.nesemu;
+package com.harryfreeborough.nesemu.cpu;
 
+import com.harryfreeborough.nesemu.DebugGen;
+import com.harryfreeborough.nesemu.NesEmu;
 import com.harryfreeborough.nesemu.instruction.AddressingMode;
 import com.harryfreeborough.nesemu.instruction.Instruction;
 import com.harryfreeborough.nesemu.instruction.Operation;
@@ -20,11 +22,11 @@ public class Cpu {
         }
     }
     
-    private final MemoryBus bus;
+    private final CpuMemory bus;
     private final CpuState state;
-    private final CpuDebug debug;
+    private final DebugGen debug;
     
-    public Cpu(MemoryBus bus, CpuState state, CpuDebug debug) {
+    public Cpu(CpuMemory bus, CpuState state, DebugGen debug) {
         this.bus = bus;
         this.state = state;
         this.debug = debug;
@@ -47,7 +49,7 @@ public class Cpu {
         AddressingMode mode = operation.getAddressingMode();
         
         if (NesEmu.DEBUG) {
-            this.debug.run(operation);
+            System.out.println(this.debug.generate(operation));
         }
         
         this.state.regMar = mode.obtainAddress(this.bus, this.state);
@@ -71,7 +73,7 @@ public class Cpu {
         this.state.flagN = false;
     }
     
-    public MemoryBus getBus() {
+    public CpuMemory getBus() {
         return this.bus;
     }
     
