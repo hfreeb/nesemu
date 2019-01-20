@@ -30,7 +30,14 @@ public enum Instruction {
         state.regA = result & 0xFF;
     }),
     AND((bus, state, mode) -> state.regA = setNZFlags(state, state.regA & mode.read1(bus, state))),
+    ORA((bus, state, mode) -> state.regA = setNZFlags(state, state.regA | mode.read1(bus, state))),
     EOR((bus, state, mode) -> state.regA = setNZFlags(state, state.regA ^ mode.read1(bus, state))),
+    ROL((bus, state, mode) -> {
+        int value = mode.read1(bus, state);
+        int carry = state.flagC ? 1 : 0;
+        state.flagC = (value & 0x80) == 0x80;
+        state.regA = setNZFlags(state, (value << 1) | carry);
+    }),
     ROR((bus, state, mode) -> {
         int value = mode.read1(bus, state);
         int carry = (state.flagC ? 1 : 0) << 7;
@@ -45,8 +52,9 @@ public enum Instruction {
     CPX(InstructionProcessor.compare(state -> state.regX)),
     CPY(InstructionProcessor.compare(state -> state.regY)),
     
-    BNE(InstructionProcessor.branch(state -> !state.flagZ)),
     BEQ(InstructionProcessor.branch(state -> state.flagZ)),
+    BNE(InstructionProcessor.branch(state -> !state.flagZ)),
+    BMI(InstructionProcessor.branch(state -> state.flagN)),
     BPL(InstructionProcessor.branch(state -> !state.flagN)),
     BCS(InstructionProcessor.branch(state -> state.flagC)),
     BCC(InstructionProcessor.branch(state -> !state.flagC)),
@@ -97,8 +105,13 @@ public enum Instruction {
         mode.write1(bus, state, result);
     }),
     PHA((bus, state, mode) -> MemoryUtils.stackPush1(state.regA, bus, state)),
+    PHP((bus, state, mode) -> MemoryUtils.stackPush1(state.getStatus(), bus, state)),
     PLA((bus, state, mode) -> state.regA = MemoryUtils.setNZFlags(state, MemoryUtils.stackPop1(bus, state))),
     JMP((bus, state, mode) -> state.regPc = state.regMar),
+    RTI((bus, state, mode) -> {
+        state.setStatus(MemoryUtils.stackPop1(bus, state));
+        state.regPc = MemoryUtils.stackPop2(bus, state) + 1;
+    }),
     NOP((bus, state, mode) -> { /* NOP */ });
     
     private final InstructionProcessor processor;

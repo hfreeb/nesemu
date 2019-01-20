@@ -4,11 +4,24 @@ public class PpuState {
     
     public final byte[] nametableData = new byte[0x1000];
     public final byte[] palleteData = new byte[0x20];
+    public final byte[] oamData = new byte[0x100];
     
     //The least 5 significant bits of the value last written into a register
     public int register;
     
-    public int scanline = -1; //Current scanline being processed
+    public int frame;
+    public int scanline;
+    public int dot;
+    public int cycle; //Total dots across program session
+    
+    public boolean oddFrame;
+    
+    public int nametableByte;
+    public int atrribTableByte;
+    public int lowTileByte;
+    public int highTileByte;
+    
+    public int regOamAddr;
     
     public int regV; //Current VRAM address (15 bits)
     public int regT; //Temporary VRAM address (15 bits)
@@ -24,9 +37,21 @@ public class PpuState {
     public int flagMasterSlave; //0 = read from EXT; 1 = write to EXT
     public boolean flagNmiOutput;
     
+    //$2001: PPUMASK
+    public boolean flagGreyscale; //Produce a greyscale display
+    public boolean flagLeftmostBackground; //Show background in leftmost 8 pixels
+    public boolean flagLeftmostSprites; //Show sprites in leftmost 8 pixels
+    public boolean flagBackground; //Show background
+    public boolean flagSprites; //Show sprites
+    public boolean flagEmphRed; //Emphasise reds
+    public boolean flagEmphGreen; //Emphasise greens
+    public boolean flagEmphBlue; //Emphasise blues
+    
     //$2002: PPUSTATUS
-    public int flagSpriteOverflow;
-    public int flagSpriteZeroHit;
+    public boolean flagSpriteOverflow;
+    public boolean flagSpriteZeroHit;
     public boolean flagNmiOccurred;
+    
+    public int dataBuffer;
     
 }

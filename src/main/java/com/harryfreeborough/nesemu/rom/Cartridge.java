@@ -3,7 +3,7 @@ package com.harryfreeborough.nesemu.rom;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class RomData {
+public class Cartridge {
     
     private final MirroringMode mirroringMode;
     private final boolean persistentMemory;
@@ -14,9 +14,9 @@ public class RomData {
     private final byte[] prgRomData;
     private final byte[] chrRomData;
     
-    RomData(MirroringMode mirroringMode, boolean persistentMemory,
-            int mapperId, int prgRomSize, int chrRomSize,
-            @Nullable byte[] trainerData, byte[] prgRomData, byte[] chrRomData) {
+    Cartridge(MirroringMode mirroringMode, boolean persistentMemory,
+              int mapperId, int prgRomSize, int chrRomSize,
+              @Nullable byte[] trainerData, byte[] prgRomData, byte[] chrRomData) {
         this.mirroringMode = mirroringMode;
         this.persistentMemory = persistentMemory;
         this.mapperId = mapperId;

@@ -1,5 +1,8 @@
 package com.harryfreeborough.nesemu.cpu;
 
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.shiftBit;
+
 public class CpuState {
     
     public final byte[] internalRam = new byte[0x800];
@@ -57,5 +60,29 @@ public class CpuState {
     public boolean flagV;
     
     public boolean flagN;
+    
+    public int getStatus() {
+        int status = 0;
+        status |= shiftBit(this.flagC, 0);
+        status |= shiftBit(this.flagZ, 1);
+        status |= shiftBit(this.flagI, 2);
+        status |= shiftBit(this.flagD, 3);
+        status |= shiftBit(this.flagB, 4);
+        status |= shiftBit(this.flagU, 5);
+        status |= shiftBit(this.flagV, 6);
+        status |= shiftBit(this.flagN, 7);
+        return status;
+    }
+    
+    public void setStatus(int value) {
+        this.flagC = bitPresent(value, 0);
+        this.flagZ = bitPresent(value, 1);
+        this.flagI = bitPresent(value, 2);
+        this.flagD = bitPresent(value, 3);
+        this.flagB = bitPresent(value, 4);
+        this.flagU = bitPresent(value, 5);
+        this.flagV = bitPresent(value, 6);
+        this.flagN = bitPresent(value, 7);
+    }
     
 }

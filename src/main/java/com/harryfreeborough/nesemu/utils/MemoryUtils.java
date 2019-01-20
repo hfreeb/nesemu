@@ -8,6 +8,14 @@ public class MemoryUtils {
     private MemoryUtils() {
     }
     
+    public static int shiftBit(boolean flag, int shift) {
+        return (flag ? 1 : 0) << shift;
+    }
+    
+    public static boolean bitPresent(int value, int bit) {
+        return ((value >> bit) & 0x01) == 0x01;
+    }
+    
     public static int programPop1(CpuMemory bus, CpuState state) {
         int value = bus.read1(state.regPc);
         state.regPc = (state.regPc + 1) & 0xFFFF;
