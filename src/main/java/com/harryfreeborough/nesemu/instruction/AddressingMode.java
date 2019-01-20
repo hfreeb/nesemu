@@ -86,12 +86,7 @@ public enum AddressingMode {
         @Override
         public int obtainAddress(CpuMemory bus, CpuState state) {
             int offset = MemoryUtils.signedByteToInt(MemoryUtils.programPop1(bus, state));
-            state.cycles++; //Assume successful if the address is obtained (should probably not do this)
-            int newAddr = (state.regPc + offset) & 0xFFFF;
-            if ((state.regPc & 0xFF00) != (offset & 0xFF00)) {
-                state.cycles++;
-            }
-            return newAddr;
+            return (state.regPc + offset) & 0xFFFF;
         }
     },
     IND("($[1,2])") {

@@ -32,6 +32,15 @@ public enum Operation {
     AND_IDX(0x21, AND, IDX, 6),
     AND_IDY(0x31, AND, IDY, 5),
     
+    ORA_IMM(0x09, ORA, IMM, 2),
+    ORA_ZPG(0x05, ORA, ZPG, 3),
+    ORA_ZPX(0x15, ORA, ZPX, 4),
+    ORA_ABS(0x0D, ORA, ABS, 4),
+    ORA_ABX(0x1D, ORA, ABX, 4),
+    ORA_ABY(0x19, ORA, ABY, 4),
+    ORA_IDX(0x01, ORA, IDX, 6),
+    ORA_IDY(0x11, ORA, IDY, 5),
+    
     EOR_IMM(0x49, EOR, IMM, 2),
     EOR_ZPG(0x45, EOR, ZPG, 3),
     EOR_ZPX(0x55, EOR, ZPX, 4),
@@ -40,6 +49,12 @@ public enum Operation {
     EOR_ABY(0x59, EOR, ABY, 4),
     EOR_IDX(0x41, EOR, IDX, 6),
     EOR_IDY(0x51, EOR, IDY, 5),
+    
+    ROL_ACC(0x2A, ROL, ACC, 2),
+    ROL_ZPG(0x26, ROL, ZPG, 5),
+    ROL_ZPX(0x36, ROL, ZPX, 6),
+    ROL_ABS(0x2E, ROL, ABS, 6),
+    ROL_ABX(0x3E, ROL, ABX, 7),
     
     ROR_ACC(0x6A, ROR, ACC, 2),
     ROR_ZPG(0x66, ROR, ZPG, 5),
@@ -58,6 +73,7 @@ public enum Operation {
     
     BEQ_REL(0xF0, BEQ, REL, 2),
     BNE_REL(0xD0, BNE, REL, 2),
+    BMI_REL(0x30, BMI, REL, 2),
     BPL_REL(0x10, BPL, REL, 2),
     BCS_REL(0xB0, BCS, REL, 2),
     BCC_REL(0x90, BCC, REL, 2),
@@ -133,6 +149,7 @@ public enum Operation {
     INC_ABX(0xFE, INC, ABX, 7),
     
     PHA_IMP(0x48, PHA, IMP, 3),
+    PHP_IMP(0x08, PHP, IMP, 3),
     PLA_IMP(0x68, PLA, IMP, 4),
     
     JMP_ABS(0x4C, JMP, ABS, 3),
@@ -154,6 +171,8 @@ public enum Operation {
     TXA_IMP(0x8A, TXA, IMP, 2),
     TYA_IMP(0x98, TYA, IMP, 2),
     TXS_IMP(0x9A, TXS, IMP, 2),
+    
+    RTI_IMP(0x40, RTI, IMP, 6),
     NOP_IMP(0xEA, NOP, IMP, 2);
     
     private final int opcode;

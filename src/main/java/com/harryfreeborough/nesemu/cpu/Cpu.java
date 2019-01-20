@@ -26,12 +26,11 @@ public class Cpu {
     private final CpuState state;
     private final DebugGen debug;
     
-    public Cpu(CpuMemory bus, CpuState state, DebugGen debug) {
+    public Cpu(CpuMemory bus, DebugGen debug) {
         this.bus = bus;
-        this.state = state;
         this.debug = debug;
         
-        reset();
+        this.state = new CpuState();
     }
     
     public boolean tick() {
@@ -59,6 +58,13 @@ public class Cpu {
         return true;
     }
     
+    public void raiseNmi() {
+        MemoryUtils.stackPush2(this.state.regPc - 1, this.bus, this.state);
+        MemoryUtils.stackPush1(this.state.getStatus(), this.bus, this.state);
+        
+        this.state.regPc = this.bus.read2(0xFFFA);
+    }
+    
     public void reset() {
         this.state.regPc = this.bus.read2(0xFFFC);
         this.state.regSp = 0xFD;
@@ -73,7 +79,7 @@ public class Cpu {
         this.state.flagN = false;
     }
     
-    public CpuMemory getBus() {
+    public CpuMemory getMemory() {
         return this.bus;
     }
     

@@ -31,9 +31,11 @@ public interface InstructionProcessor {
     static InstructionProcessor branch(Predicate<CpuState> predicate) {
         return (bus, state, mode ) -> {
             if (predicate.test(state)) {
+                state.cycles += 2;
+                if ((state.regPc & 0xFF00) != (state.regMar & 0xFF00)) {
+                    state.cycles++;
+                }
                 state.regPc = state.regMar;
-            } else {
-                state.regPc = state.regPc & 0xFFFF; //Skip arg
             }
         };
     }

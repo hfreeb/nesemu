@@ -11,7 +11,7 @@ public class RomReader {
     
     private RomReader() {}
     
-    public static Optional<RomData> read(Path path) {
+    public static Optional<Cartridge> read(Path path) {
         try (FileReader reader = new FileReader(path)) {
             int[] verification = {'N', 'E', 'S', 0x1A};
             for (int i = 0; i < verification.length; i++) {
@@ -44,7 +44,7 @@ public class RomReader {
             byte[] chrRomData = reader.readBytes(0x2000 * chrRomSize);
             
             return Optional.of(
-                    new RomData(mirroringMode, persistentMemory, mapperId, prgRomSize, chrRomSize,
+                    new Cartridge(mirroringMode, persistentMemory, mapperId, prgRomSize, chrRomSize,
                                 trainerData, prgRomData, chrRomData)
             );
         } catch (IOException e) {
