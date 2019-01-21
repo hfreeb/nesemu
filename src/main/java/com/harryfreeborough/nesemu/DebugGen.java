@@ -68,13 +68,31 @@ public class DebugGen {
         builder.append(" SP:");
         builder.append(String.format("%02X", cpuState.regPc));
         builder.append(" PPU:");
-        
-        String scanline = Integer.toString(this.console.getPpu().getState().scanline);
+
+        PpuState ppuState = this.console.getPpu().getState();
+
+        String scanline = Integer.toString(ppuState.scanline);
         for (int i = scanline.length(); i < 3; i++) {
             builder.append(" ");
         }
         builder.append(scanline);
-        
+
+        String dot = Integer.toString(ppuState.dot);
+        for (int i = dot.length(); i < 3; i++) {
+            builder.append(" ");
+        }
+
+        builder.append("(");
+        builder.append(dot);
+        builder.append(")");
+
+        builder.append(" v:");
+        String v = Integer.toBinaryString(ppuState.regV);
+        for (int i = v.length(); i < 15; i++) {
+            builder.append("0");
+        }
+        builder.append(v);
+
         builder.append(" CYC:");
         builder.append(Integer.toString(cpuState.cycles));
         builder.append(" (");
