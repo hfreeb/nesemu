@@ -5,6 +5,8 @@ public class PpuState {
     public final byte[] nametableData = new byte[0x1000];
     public final byte[] palleteData = new byte[0x20];
     public final byte[] oamData = new byte[0x100];
+
+    public final int[] backbuffer = new int[256 * 240];
     
     //The least 5 significant bits of the value last written into a register
     public int register;
@@ -17,10 +19,12 @@ public class PpuState {
     public boolean oddFrame;
     
     public int nametableByte;
-    public int atrribTableByte;
+    public int attribTableByte;
     public int lowTileByte;
     public int highTileByte;
-    
+
+    public int[] pixelData = new int[8]; //Colour value for the next 8 pixels
+
     public int regOamAddr;
     
     public int regV; //Current VRAM address (15 bits)
