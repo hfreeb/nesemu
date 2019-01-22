@@ -23,7 +23,7 @@ public class PpuState {
     public int lowTileByte;
     public int highTileByte;
 
-    public int[] pixelData = new int[8]; //Colour value for the next 8 pixels
+    public long tileData;
 
     public int regOamAddr;
     

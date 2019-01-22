@@ -29,9 +29,20 @@ public class NesEmu {
 
         EmuFrame frame = new EmuFrame(console);
 
+        long lastFpsReport = 0;
+        int frames = 0;
+
         int cycles = 0;
         while (cpu.tick()) {
             int catchup = (cpu.getState().cycles - cycles) * 3;
+
+            long now = System.currentTimeMillis();
+            if (now - lastFpsReport > 1000) {
+                System.out.println(console.getPpu().getState().frame - frames);
+                lastFpsReport = now;
+                frames = console.getPpu().getState().frame;
+            }
+
             for (int i = 0; i < catchup; i++) {
                 if (console.getPpu().tick()) {
                     SwingUtilities.invokeLater(() -> {

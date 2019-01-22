@@ -1,6 +1,7 @@
 package com.harryfreeborough.nesemu.ppu;
 
 import com.harryfreeborough.nesemu.Console;
+import com.harryfreeborough.nesemu.NesEmu;
 import com.harryfreeborough.nesemu.cpu.CpuState;
 
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
@@ -26,8 +27,8 @@ public class Ppu {
         writeRegister(0x2003, 0);
         this.state.regOamAddr = 0;
         this.state.frame = 0;
-        this.state.scanline = 0;
-        this.state.dot = 0;
+        this.state.scanline = 240;
+        this.state.dot = 340;
     }
 
     public void renderPixel() {
@@ -36,7 +37,8 @@ public class Ppu {
 
         int background = 0;
         if (x >= 8 || this.state.flagLeftmostBackground) {
-            background = this.state.pixelData[x % 8];
+            int tileData = (int) (this.state.tileData >> 32);
+            background = (tileData >> ((7 - x) * 4)) & 0xF;
         }
 
         this.state.backbuffer[y * 256 + x] = background;
@@ -204,15 +206,20 @@ public class Ppu {
         return 0x1000 * table + 16 * tile + fineY;
     }
 
-    private void calculatePixels() {
+    private void calculateTileData() {
+        int data = 0;
         for (int i = 0; i < 8; i++) {
-            this.state.pixelData[i] = this.state.attribTableByte
+            data  <<= 4;
+
+            data |= this.state.attribTableByte
                     | ((this.state.lowTileByte & 0x80) >> 7)
                     | ((this.state.highTileByte & 0x80) >> 6);
 
             this.state.lowTileByte <<= 1;
             this.state.highTileByte <<= 1;
         }
+
+        this.state.tileData |= data;
     }
 
     private void processRenderLine() {
@@ -220,6 +227,7 @@ public class Ppu {
                 (this.state.dot >= 321 && this.state.dot <= 336);   //Pre-fetch cycles
 
         if (fetchCycle) {
+            this.state.tileData <<= 4;
             //TODO: Split up fetch into setting addr bus value and reading
             switch ((this.state.dot - 1) % 8) {
                 case 0: { //NT Byte
@@ -245,16 +253,17 @@ public class Ppu {
                     this.state.highTileByte = this.memory.read1(getLowTileAddress() + 8);
                     break;
                 case 7:
-                    calculatePixels();
+                    calculateTileData();
+
                     incX();
                     break;
             }
 
             if (this.state.dot == 256) {
                 incY();
-            } else if (this.state.dot == 257) {
-                copyX();
             }
+        } else if (this.state.dot == 257) {
+            copyX();
         }
     }
 
@@ -276,6 +285,8 @@ public class Ppu {
 
     //https://wiki.nesdev.com/w/images/d/d1/Ntsc_timing.png
     public boolean tick() {
+        boolean rerender = false;
+
         this.state.cycle++;
         this.state.dot++;
 
@@ -284,7 +295,8 @@ public class Ppu {
             this.state.scanline++;
 
             if (this.state.scanline == 240) {
-                return true;
+                this.state.frame++;
+                rerender = true;
             } else if (this.state.scanline == 262) {
                 this.state.scanline = 0;
 
@@ -302,6 +314,9 @@ public class Ppu {
             //Visible scanline
             if (this.state.dot >= 1 && this.state.dot <= 256) {
                 renderPixel();
+                if (NesEmu.DEBUG) {
+                    rerender = true;
+                }
             }
             processRenderLine();
         } else if (this.state.scanline == 241 && this.state.dot == 1) {
@@ -311,7 +326,7 @@ public class Ppu {
             }
         }
 
-        return false;
+        return rerender;
     }
 
     public PpuState getState() {
