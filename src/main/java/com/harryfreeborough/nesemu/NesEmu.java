@@ -23,6 +23,7 @@ public class NesEmu {
                 .orElseThrow(() -> new RuntimeException("Failed to read rom."));
 
         Preconditions.checkState(data.getMapperId() == 0, "Only the NROM mapper is currently supported.");
+        Preconditions.checkState(data.getChrRomSize() != 0, "CHR RAM is not supported.");
 
         Console console = new Console(data);
         Cpu cpu = console.getCpu();
