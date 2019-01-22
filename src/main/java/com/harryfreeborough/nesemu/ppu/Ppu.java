@@ -223,7 +223,7 @@ public class Ppu {
             this.state.highTileByte <<= 1;
         }
 
-        this.state.tileData |= data;
+        this.state.tileData |= Integer.toUnsignedLong(data);
     }
 
     private void processRenderLine() {
