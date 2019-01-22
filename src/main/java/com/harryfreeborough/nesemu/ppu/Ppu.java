@@ -36,12 +36,16 @@ public class Ppu {
         int y = this.state.scanline;
 
         int background = 0;
-        if (x >= 8 || this.state.flagLeftmostBackground) {
+        if (this.state.flagBackground && (x >= 8 || this.state.flagLeftmostBackground)) {
             int tileData = (int) (this.state.tileData >> 32);
             background = (tileData >> ((7 - this.state.regX) * 4)) & 0xF;
         }
-
-        this.state.backbuffer[y * 256 + x] = background;
+    
+        if (background >= 16 && background % 4 == 0) {
+            background -= 16;
+        }
+        
+        this.state.backbuffer[y * 256 + x] = this.console.getPpu().getState().palleteData[background] % 64;
     }
 
     public int readRegister(int address) {
@@ -241,7 +245,6 @@ public class Ppu {
                     int address = 0x23C0 | (v & 0x0C00) | ((v >> 4) & 0x38) | ((v >> 2) & 0x07);
                     //Maybe? Gets the shift to get the two bit palette id for the block (16x16)
                     int shift = ((v >> 4) & 4) | (v & 2);
-                    //TODO: HOW DOES THIS WORK?!?!?!?!? :'(
                     this.state.attribTableByte = ((this.memory.read1(address) >> shift) & 3) << 2;
                     break;
                 }
