@@ -38,7 +38,7 @@ public class Ppu {
         int background = 0;
         if (x >= 8 || this.state.flagLeftmostBackground) {
             int tileData = (int) (this.state.tileData >> 32);
-            background = (tileData >> ((7 - x) * 4)) & 0xF;
+            background = (tileData >> ((7 - this.state.regX) * 4)) & 0xF;
         }
 
         this.state.backbuffer[y * 256 + x] = background;
