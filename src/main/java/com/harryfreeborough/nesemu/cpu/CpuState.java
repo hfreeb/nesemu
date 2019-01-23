@@ -1,12 +1,20 @@
 package com.harryfreeborough.nesemu.cpu;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.shiftBit;
 
 public class CpuState {
     
     public final byte[] internalRam = new byte[0x800];
-    
+
+    public final boolean[] buttonState = new boolean[8];
+    public final Queue<Boolean> buttonStateCache = new LinkedList<>();
+
+    public boolean flagStrobe;
+
     //CPU Cycles that need to be catched up on by other devices
     //(i.e. PPU, APU and controller processor, WE it is called /TODO)
     public int cycles;

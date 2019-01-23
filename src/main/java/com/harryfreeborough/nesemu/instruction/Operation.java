@@ -77,6 +77,8 @@ public enum Operation {
     BPL_REL(0x10, BPL, REL, 2),
     BCS_REL(0xB0, BCS, REL, 2),
     BCC_REL(0x90, BCC, REL, 2),
+    BVS_REL(0x70, BVS, REL, 2),
+    BVC_REL(0x50, BVC, REL, 2),
     
     LSR_ACC(0x4A, LSR, ACC, 2),
     LSR_ZPG(0x46, LSR, ZPG, 5),
@@ -149,6 +151,7 @@ public enum Operation {
     INC_ABX(0xFE, INC, ABX, 7),
     
     PHA_IMP(0x48, PHA, IMP, 3),
+    PLP_IMP(0x28, PLP, IMP, 4),
     PHP_IMP(0x08, PHP, IMP, 3),
     PLA_IMP(0x68, PLA, IMP, 4),
     
@@ -160,6 +163,7 @@ public enum Operation {
     CLI_IMP(0x58, CLI, IMP, 2),
     SEI_IMP(0x78, SEI, IMP, 2),
     CLV_IMP(0xB8, CLV, IMP, 2),
+    SED_IMP(0xF8, SED, IMP, 2),
     CLD_IMP(0xD8, CLD, IMP, 2),
     
     JSR_ABS(0x20, JSR, ABS, 6),
@@ -171,7 +175,8 @@ public enum Operation {
     TXA_IMP(0x8A, TXA, IMP, 2),
     TYA_IMP(0x98, TYA, IMP, 2),
     TXS_IMP(0x9A, TXS, IMP, 2),
-    
+    TSX_IMP(0xBA, TSX, IMP, 2),
+
     RTI_IMP(0x40, RTI, IMP, 6),
     NOP_IMP(0xEA, NOP, IMP, 2);
     

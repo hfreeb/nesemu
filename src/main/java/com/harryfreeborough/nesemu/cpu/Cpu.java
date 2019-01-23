@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Cpu {
-    
+
     private static Map<Integer, Operation> operations;
     
     static {
@@ -46,7 +46,7 @@ public class Cpu {
         
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
-        
+
         if (NesEmu.DEBUG) {
             System.out.println(this.debug.generate(operation));
         }
