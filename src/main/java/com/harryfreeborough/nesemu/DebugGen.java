@@ -66,7 +66,7 @@ public class DebugGen {
         builder.append(" P:");
         builder.append(String.format("%02X", cpuState.regPc));
         builder.append(" SP:");
-        builder.append(String.format("%02X", cpuState.regPc));
+        builder.append(String.format("%02X", cpuState.regSp));
         builder.append(" PPU:");
 
         PpuState ppuState = this.console.getPpu().getState();

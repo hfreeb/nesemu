@@ -12,7 +12,7 @@ public interface Memory {
     
     default void write2(int address, int value) {
         write1(address, value & 0xFF);
-        write1(address, value >> 8);
+        write1(address + 1, value >> 8); //TODO: check
     }
     
 }
