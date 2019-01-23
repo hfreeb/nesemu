@@ -7,27 +7,26 @@ import static com.harryfreeborough.nesemu.utils.MemoryUtils.setNZFlags;
 public enum Instruction {
     
     ADC((bus, state, mode) -> {
+        int a = state.regA;
         int value = mode.read1(bus, state);
-        int result = state.regA + value + (state.flagC ? 1 : 0);
+        int result = a + value + (state.flagC ? 1 : 0);
         
         state.flagC = (result >> 8) != 0;
-        state.flagV = (((state.regA ^ value) & 0x80) == 0) &&
-                (((state.regA ^ result) & 0x80) != 0);
-        setNZFlags(state, result);
+        state.regA = setNZFlags(state, result & 0xFF);
         
-        state.regA = result & 0xFF;
+        state.flagV = (((a ^ value) & 0x80) == 0) &&
+                (((a ^ state.regA) & 0x80) != 0);
     }),
     SBC((bus, state, mode) -> {
+        int a = state.regA;
         int value = mode.read1(bus, state);
-        int result = state.regA - value + (state.flagC ? 1 : 0);
-        
+        int result = a - value - (1 - (state.flagC ? 1 : 0));
+    
         state.flagC = (result >> 8) == 0;
-        state.flagV = ((state.regA ^ result) & (value ^ result) & 0x80) == 0x80;
-        state.flagV = (((state.regA ^ value) & 0x80) == 0) &&
-                (((state.regA ^ result) & 0x80) != 0);
-        setNZFlags(state, result);
+        state.regA = setNZFlags(state, result & 0xFF);
         
-        state.regA = result & 0xFF;
+        state.flagV = (((a ^ value) & 0x80) != 0) &&
+                (((a ^ state.regA) & 0x80) != 0);
     }),
     AND((bus, state, mode) -> state.regA = setNZFlags(state, state.regA & mode.read1(bus, state))),
     ORA((bus, state, mode) -> state.regA = setNZFlags(state, state.regA | mode.read1(bus, state))),
@@ -117,7 +116,9 @@ public enum Instruction {
         state.setStatus(MemoryUtils.stackPop1(bus, state));
         state.regPc = MemoryUtils.stackPop2(bus, state) + 1;
     }),
-    NOP((bus, state, mode) -> { /* NOP */ });
+    NOP((bus, state, mode) -> { /* NOP */ }),
+    /* Unofficial opcodes */
+    RLA(InstructionProcessor.combination(ROL, AND));
     
     private final InstructionProcessor processor;
     

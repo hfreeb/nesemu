@@ -8,12 +8,14 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.setNZFlags;
+
 public interface InstructionProcessor {
     
     static InstructionProcessor load(BiConsumer<CpuState, Integer> consumer) {
         return (bus, state, mode) -> {
             int value = mode.read1(bus, state);
-            MemoryUtils.setNZFlags(state, value);
+            setNZFlags(state, value);
             consumer.accept(state, value);
         };
     }
@@ -22,9 +24,7 @@ public interface InstructionProcessor {
         return (bus, state, mode) -> {
             int value = mode.read1(bus, state);
             int register = function.apply(state);
-            state.flagZ = register == value;
-            state.flagC = register >= value;
-            state.flagN = (value & 1 << 7) != 0;
+            state.flagC = setNZFlags(state, register - value) >= 0;
         };
     }
     
@@ -36,6 +36,14 @@ public interface InstructionProcessor {
                     state.cycles++;
                 }
                 state.regPc = state.regMar;
+            }
+        };
+    }
+    
+    static InstructionProcessor combination(Instruction... instructions) {
+        return (bus, state, mode) -> {
+            for (Instruction instruction : instructions) {
+                instruction.getProcessor().execute(bus, state, mode);
             }
         };
     }

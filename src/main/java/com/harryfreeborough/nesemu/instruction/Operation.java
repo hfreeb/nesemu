@@ -178,7 +178,16 @@ public enum Operation {
     TSX_IMP(0xBA, TSX, IMP, 2),
 
     RTI_IMP(0x40, RTI, IMP, 6),
-    NOP_IMP(0xEA, NOP, IMP, 2);
+    NOP_IMP(0xEA, NOP, IMP, 2),
+    
+    /* Unofficial opcodes */
+    RLA_ZPG(0x27, RLA, ZPG, 5),
+    RLA_ZPX(0x37, RLA, ZPX, 6),
+    RLA_ABS(0x2F, RLA, ABS, 6),
+    RLA_ABX(0x3F, RLA, ABX, 7),
+    RLA_ABY(0x3B, RLA, ABY, 7),
+    RLA_IDX(0x23, RLA, IDX, 8),
+    RLA_IDY(0x33, RLA, IDY, 8);
     
     private final int opcode;
     private final Instruction instruction;
