@@ -3,7 +3,10 @@ package com.harryfreeborough.nesemu.cpu;
 import com.harryfreeborough.nesemu.Console;
 import com.harryfreeborough.nesemu.rom.Cartridge;
 import com.harryfreeborough.nesemu.utils.Memory;
+import com.harryfreeborough.nesemu.utils.MemoryUtils;
 import com.harryfreeborough.nesemu.utils.Preconditions;
+
+import java.util.Arrays;
 
 public class CpuMemory implements Memory {
     
@@ -23,8 +26,20 @@ public class CpuMemory implements Memory {
             return Byte.toUnsignedInt(state.internalRam[address % 0x800]);
         } else if (address < 0x4000) {
             return this.console.getPpu().readRegister(0x2000 + (address % 8));
-        } else if (address == 0x4016 || address == 0x4017) {
-            return 0; //TODO: Implement Joystick 1 & 2 data as well as joystick strobe and frame counter control
+        } else if (address == 0x4016) {
+            if (state.flagStrobe) {
+                return 0x40 | (state.buttonState[0] ? 1 : 0);
+            } else {
+                Boolean val = state.buttonStateCache.remove();
+                int i = 1;
+                if (val != null) {
+                    i = val ? 1 : 0;
+                }
+
+                return 0x40 | i;
+            }
+        } else if (address == 0x4017) {
+            return 0;
         } else if (address < 0x4020) {
             //APU and I/O registers
         } else if (address < 0x8000) {
@@ -54,6 +69,16 @@ public class CpuMemory implements Memory {
             this.console.getPpu().writeRegister(0x2000 + (address % 8), value);
         } else if (address == 0x4014) {
             this.console.getPpu().writeRegister(address, value);
+        } else if (address == 0x4016) {
+            if (MemoryUtils.bitPresent(value, 0)) {
+                state.flagStrobe = true;
+            } else {
+                state.flagStrobe = false;
+                state.buttonStateCache.clear();
+                for (boolean i : state.buttonState) {
+                    state.buttonStateCache.offer(i);
+                }
+            }
         } else if (address < 0x6000) {
             //I/O and audio registers
         } else {

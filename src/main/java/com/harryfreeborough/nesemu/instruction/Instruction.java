@@ -36,7 +36,7 @@ public enum Instruction {
         int value = mode.read1(bus, state);
         int carry = state.flagC ? 1 : 0;
         state.flagC = (value & 0x80) == 0x80;
-        state.regA = setNZFlags(state, (value << 1) | carry);
+        mode.write1(bus, state, setNZFlags(state, ((value << 1) | carry) & 0xFF));
     }),
     ROR((bus, state, mode) -> {
         int value = mode.read1(bus, state);
@@ -58,7 +58,9 @@ public enum Instruction {
     BPL(InstructionProcessor.branch(state -> !state.flagN)),
     BCS(InstructionProcessor.branch(state -> state.flagC)),
     BCC(InstructionProcessor.branch(state -> !state.flagC)),
-    
+    BVS(InstructionProcessor.branch(state -> state.flagV)),
+    BVC(InstructionProcessor.branch(state -> !state.flagV)),
+
     LDX(InstructionProcessor.load((state, value) -> state.regX = value)),
     LDY(InstructionProcessor.load((state, value) -> state.regY = value)),
     INY((bus, state, mode) -> state.regY = setNZFlags(state, (state.regY + 1) & 0xFF)),
@@ -74,6 +76,7 @@ public enum Instruction {
     CLI((bus, state, mode) -> state.flagI = false),
     SEI((bus, state, mode) -> state.flagI = true),
     CLV((bus, state, mode) -> state.flagV = false),
+    SED((bus, state, mode) -> state.flagD = true),
     CLD((bus, state, mode) -> state.flagD = false),
     BIT((bus, state, mode) -> {
         int value = mode.read1(bus, state);
@@ -88,7 +91,8 @@ public enum Instruction {
     TAY((bus, state, mode) -> state.regY = setNZFlags(state, state.regA)),
     TXA((bus, state, mode) -> state.regA = setNZFlags(state, state.regX)),
     TYA((bus, state, mode) -> state.regA = setNZFlags(state, state.regY)),
-    TXS(((bus, state, mode) -> state.regSp = state.regX)),
+    TXS(((bus, state, mode) -> state.regSp = setNZFlags(state, state.regX))),
+    TSX(((bus, state, mode) -> state.regX = setNZFlags(state, state.regSp))),
     LSR((bus, state, mode) -> {
         int old = mode.read1(bus, state);
         state.flagC = (old & 1) == 1;
@@ -106,6 +110,7 @@ public enum Instruction {
     }),
     PHA((bus, state, mode) -> MemoryUtils.stackPush1(state.regA, bus, state)),
     PHP((bus, state, mode) -> MemoryUtils.stackPush1(state.getStatus(), bus, state)),
+    PLP((bus, state, mode) -> state.setStatus(MemoryUtils.stackPop1(bus, state))),
     PLA((bus, state, mode) -> state.regA = MemoryUtils.setNZFlags(state, MemoryUtils.stackPop1(bus, state))),
     JMP((bus, state, mode) -> state.regPc = state.regMar),
     RTI((bus, state, mode) -> {

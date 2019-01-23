@@ -11,8 +11,8 @@ import java.nio.file.Paths;
 
 public class NesEmu {
 
-    public static final boolean DEBUG = System.getProperty("debug") != null;
-    private static final int SCANLINE_CPU_CYCLES = 114; //263 / 3 TODO: should be 113 + 2/3
+    public static boolean DEBUG = System.getProperty("debug") != null;
+    private static final long FRAME_TIME = Math.floorDiv(1000, 60);
 
     public static void main(String[] args) {
         new NesEmu().run(args[0]);
@@ -33,16 +33,10 @@ public class NesEmu {
         long lastFpsReport = 0;
         int frames = 0;
 
+        long lastFrame = 0;
         int cycles = 0;
         while (cpu.tick()) {
             int catchup = (cpu.getState().cycles - cycles) * 3;
-
-            long now = System.currentTimeMillis();
-            if (now - lastFpsReport > 1000) {
-                System.out.println(console.getPpu().getState().frame - frames);
-                lastFpsReport = now;
-                frames = console.getPpu().getState().frame;
-            }
 
             for (int i = 0; i < catchup; i++) {
                 if (console.getPpu().tick()) {
@@ -50,6 +44,19 @@ public class NesEmu {
                         frame.validate();
                         frame.repaint();
                     });
+
+                    /*
+                                       long now = System.currentTimeMillis();
+                    long delta = now - lastFrame;
+                    if (delta < FRAME_TIME) {
+                        try {
+                            Thread.sleep(FRAME_TIME - delta);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    lastFrame = now;*/
                 }
             }
 

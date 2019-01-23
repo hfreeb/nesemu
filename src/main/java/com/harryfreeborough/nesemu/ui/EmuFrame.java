@@ -17,6 +17,8 @@ public class EmuFrame extends JFrame {
         setMinimumSize(new Dimension(256 * 2, 240 * 2));
         pack();
         setVisible(true);
+
+        addKeyListener(new EmuKeyListener(console.getCpu().getState()));
     }
 
 }
