@@ -40,17 +40,17 @@ public class MemoryUtils {
     }
     
     public static void stackPush2(int value, CpuMemory bus, CpuState state) {
-        stackPush1(value & 0xFF, bus, state);
         stackPush1(value >> 8, bus, state);
+        stackPush1(value & 0xFF, bus, state);
     }
-    
+
     public static int stackPop1(CpuMemory bus, CpuState state) {
         state.regSp = (state.regSp + 1) & 0xFF;
         return bus.read1(state.regSp + 0x100);
     }
     
     public static int stackPop2(CpuMemory bus, CpuState state) {
-        return (stackPop1(bus, state) << 8) | (stackPop1(bus, state) & 0xFF);
+        return (stackPop1(bus, state) & 0xFF) | (stackPop1(bus, state) << 8);
     }
     
     public static int signedByteToInt(int b) {
