@@ -16,7 +16,7 @@ public class Console {
         this.cartridge = cartridge;
         
         CpuMemory cpuMemory = new CpuMemory(this);
-        this.cpu = new Cpu(cpuMemory, new DebugGen(this));
+        this.cpu = new Cpu(cpuMemory);
         
         PpuMemory ppuMemory = new PpuMemory(this);
         this.ppu = new Ppu(this, ppuMemory);

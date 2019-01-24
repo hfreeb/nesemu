@@ -18,7 +18,7 @@ public enum AddressingMode {
         }
     },
     IMP(""),
-    IMM("#[1]") {
+    IMM("#$[1]") {
         @Override
         public int read1(CpuMemory bus, CpuState state) {
             return MemoryUtils.programPop1(bus, state);
@@ -92,25 +92,26 @@ public enum AddressingMode {
     IND("($[1,2])") {
         @Override
         public int obtainAddress(CpuMemory bus, CpuState state) {
-            return bus.read2(MemoryUtils.programPop2(bus, state));
+            return bus.read2Bug(MemoryUtils.programPop2(bus, state));
         }
     },
     IDX("($[1],X)") {
         @Override
         public int obtainAddress(CpuMemory bus, CpuState state) {
-            int address = MemoryUtils.programPop1(bus, state) + state.regX;
-            return bus.read2(address & 0xFFFF);
+            int address = (MemoryUtils.programPop1(bus, state) + state.regX) & 0xFF;
+            return bus.read2Bug(address);
         }
     },
     IDY("($[1]),Y") {
         @Override
         public int obtainAddress(CpuMemory bus, CpuState state) {
             int popped = MemoryUtils.programPop1(bus, state);
-            int address = (bus.read2(popped) + state.regY) & 0xFFFF;
-            if ((popped & 0xFF00) != (address & 0xFF00)) {
+            int address = bus.read2Bug(popped);
+            int indexed = (address + state.regY) & 0xFFFF;
+            if ((address & 0xFF00) != (indexed & 0xFF00)) {
                 state.cycles++;
             }
-            return address;
+            return indexed;
         }
     };
     

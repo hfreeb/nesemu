@@ -35,7 +35,7 @@ public class MemoryUtils {
     }
     
     public static void stackPush1(int value, CpuMemory bus, CpuState state) {
-        bus.write1(state.regSp + 0x100, value);
+        bus.write1(0x100 | state.regSp, value);
         state.regSp = (state.regSp - 1) & 0xFF;
     }
     
@@ -46,11 +46,13 @@ public class MemoryUtils {
 
     public static int stackPop1(CpuMemory bus, CpuState state) {
         state.regSp = (state.regSp + 1) & 0xFF;
-        return bus.read1(state.regSp + 0x100);
+        return bus.read1(0x100 | state.regSp);
     }
     
     public static int stackPop2(CpuMemory bus, CpuState state) {
-        return (stackPop1(bus, state) & 0xFF) | (stackPop1(bus, state) << 8);
+        int lsb = stackPop1(bus, state);
+        int msb = stackPop1(bus, state);
+        return lsb | (msb << 8);
     }
     
     public static int signedByteToInt(int b) {

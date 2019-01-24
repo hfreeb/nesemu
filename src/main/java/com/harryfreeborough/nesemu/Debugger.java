@@ -8,15 +8,98 @@ import com.harryfreeborough.nesemu.instruction.Operation;
 import com.harryfreeborough.nesemu.ppu.PpuState;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
-public class DebugGen {
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.Scanner;
 
-    private final Console console;
+public class Debugger {
     
-    public DebugGen(Console console) {
-        this.console = console;
+    private static boolean LOG = System.getProperty("debug-log") != null;
+    private final static Integer BREAKPOINT;
+    
+    static {
+        String value = System.getProperty("debug-target-pc");
+        if (value != null) {
+            BREAKPOINT = Integer.parseInt(value, 16);
+        } else {
+           BREAKPOINT = null;
+        }
     }
     
-    public String generate(Operation operation) {
+    private final Console console;
+    private final Scanner scanner;
+    private FileWriter fileWriter;
+    private BufferedWriter bufferedWriter;
+    private boolean paused = false;
+    
+    public Debugger(Console console) {
+        this.console = console;
+        this.scanner = new Scanner(System.in);
+        
+        try {
+            this.fileWriter = new FileWriter(Paths.get("latest.log").toFile());
+            this.bufferedWriter = new BufferedWriter(this.fileWriter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public Optional<Integer> getTargetPc() {
+        return Optional.ofNullable(BREAKPOINT);
+    }
+    
+    public boolean isPaused() {
+        return this.paused;
+    }
+    
+    public void pause() {
+        this.paused = true;
+    }
+    
+    public boolean processPause() {
+        String[] input = this.scanner.nextLine().split(" ");
+        
+        switch (input[0]) {
+            case "s":
+                return true;
+            case "r1":
+                if (input.length < 2) {
+                    System.out.println("Invalid syntax");
+                } else {
+                    int value = this.console.getCpu().getMemory().read1(Integer.parseInt(input[1], 16));
+                    System.out.println(String.format("$%02X", value));
+                }
+                break;
+            case "r2":
+                if (input.length < 2) {
+                    System.out.println("Invalid syntax");
+                } else {
+                    int value = this.console.getCpu().getMemory().read2(Integer.parseInt(input[1], 16));
+                    System.out.println(String.format("$%04X", value));
+                }
+                break;
+            case "c":
+                this.paused = false;
+                return true;
+            case "q":
+                write();
+                System.exit(0); //TODO: We don't really want to be doing this..
+            default:
+                System.out.println("Invalid command");
+                break;
+        }
+        
+        return false;
+    }
+    
+    public void process(Operation operation) {
+        if (!LOG && !paused) {
+            return;
+        }
+        
         //TODO: Clean this all up
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
@@ -95,8 +178,29 @@ public class DebugGen {
         builder.append(" (");
         builder.append(cpuState.cycles / (114*260*60));
         builder.append("s)");
+    
+        if (this.paused) {
+            System.out.println(builder.toString());
+        }
         
-        return builder.toString();
+        builder.append("\n");
+    
+        if (LOG) {
+            try {
+                this.bufferedWriter.append(builder.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void write() {
+        try {
+            this.bufferedWriter.close();
+            this.fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
 }

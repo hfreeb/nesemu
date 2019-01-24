@@ -317,9 +317,9 @@ public class Ppu {
             //Visible scanline
             if (this.state.dot >= 1 && this.state.dot <= 256) {
                 renderPixel();
-                if (NesEmu.DEBUG) {
+                /*if (NesEmu.DEBUG) {
                     rerender = true;
-                }
+                }*/
             }
             processRenderLine();
         } else if (this.state.scanline == 241 && this.state.dot == 1) {

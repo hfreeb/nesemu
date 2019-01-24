@@ -1,6 +1,5 @@
 package com.harryfreeborough.nesemu.cpu;
 
-import com.harryfreeborough.nesemu.DebugGen;
 import com.harryfreeborough.nesemu.NesEmu;
 import com.harryfreeborough.nesemu.instruction.AddressingMode;
 import com.harryfreeborough.nesemu.instruction.Instruction;
@@ -24,11 +23,9 @@ public class Cpu {
     
     private final CpuMemory bus;
     private final CpuState state;
-    private final DebugGen debug;
     
-    public Cpu(CpuMemory bus, DebugGen debug) {
+    public Cpu(CpuMemory bus) {
         this.bus = bus;
-        this.debug = debug;
         
         this.state = new CpuState();
     }
@@ -47,9 +44,7 @@ public class Cpu {
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
 
-        if (NesEmu.DEBUG) {
-            System.out.println(this.debug.generate(operation));
-        }
+        NesEmu.DEBUGGER.process(operation);
         
         this.state.regMar = mode.obtainAddress(this.bus, this.state);
         instruction.getProcessor().execute(this.bus, this.state, mode);
@@ -59,7 +54,7 @@ public class Cpu {
     }
     
     public void raiseNmi() {
-        MemoryUtils.stackPush2(this.state.regPc - 1, this.bus, this.state);
+        MemoryUtils.stackPush2(this.state.regPc, this.bus, this.state);
         MemoryUtils.stackPush1(this.state.getStatus(), this.bus, this.state);
         
         this.state.regPc = this.bus.read2(0xFFFA);
