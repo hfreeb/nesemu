@@ -109,7 +109,7 @@ public enum Instruction {
         mode.write1(bus, state, result);
     }),
     PHA((bus, state, mode) -> MemoryUtils.stackPush1(state.regA, bus, state)),
-    PHP((bus, state, mode) -> MemoryUtils.stackPush1(state.getStatus() | 0x10, bus, state)),
+    PHP((bus, state, mode) -> MemoryUtils.stackPush1(state.getStatus() | 0x10, bus, state)), //TODO: Check | 0x10
     PLP((bus, state, mode) -> state.setStatus(MemoryUtils.stackPop1(bus, state))),
     PLA((bus, state, mode) -> state.regA = MemoryUtils.setNZFlags(state, MemoryUtils.stackPop1(bus, state))),
     JMP((bus, state, mode) -> state.regPc = state.regMar),
