@@ -26,7 +26,7 @@ public class PpuMemory implements Memory {
             return Byte.toUnsignedInt(cartridge.getChrRomData()[address]);
         } else if (address < 0x3F00) {
             MirroringMode mode = cartridge.getMirroringMode();
-            return state.nametableData[mirrorAddress(mode, address % 2048)];
+            return Byte.toUnsignedInt(state.nametableData[mirrorAddress(mode, address % 2048)]);
         } else {
             return state.palleteData[address % 0x20];
         }

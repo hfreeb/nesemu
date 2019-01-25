@@ -1,8 +1,9 @@
 package com.harryfreeborough.nesemu.ppu;
 
 import com.harryfreeborough.nesemu.Console;
-import com.harryfreeborough.nesemu.NesEmu;
 import com.harryfreeborough.nesemu.cpu.CpuState;
+
+import java.util.Arrays;
 
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.shiftBit;
@@ -35,17 +36,58 @@ public class Ppu {
         int x = this.state.dot - 1;
         int y = this.state.scanline;
 
-        int background = 0;
-        if (this.state.flagBackground && (x >= 8 || this.state.flagLeftmostBackground)) {
+        int backgroundColour = 0;
+        if (x >= 8 || this.state.flagLeftmostBackground) {
             int tileData = (int) (this.state.tileData >> 32);
-            background = (tileData >> ((7 - this.state.regX) * 4)) & 0xF;
+            backgroundColour = (tileData >> ((7 - this.state.regX) * 4)) & 0xF;
         }
     
-        if (background >= 16 && background % 4 == 0) {
-            background -= 16;
+        if (backgroundColour >= 16 && backgroundColour % 4 == 0) {
+            backgroundColour -= 16;
+        }
+
+        int spriteColour = 0;
+
+        Sprite sprite = null;
+        if (x >= 8 || this.state.flagLeftmostSprites) {
+            for (int i = 0; i < this.state.spriteCount; i++) {
+                sprite = this.state.sprites[i];
+                int offset = x - sprite.getX();
+                if (offset < 0 || offset > 7) {
+                    continue;
+                }
+
+                spriteColour = (sprite.getPattern() >> (4 * (7 - offset))) & 0x0F;
+                if (spriteColour % 4 == 0) {
+                    continue;
+                }
+
+                System.out.println("Sprite hit at x=" + x + " Leftmost = " + this.state.flagLeftmostSprites);
+                break;
+            }
+        }
+
+        int colour = 0;
+
+        boolean renderBackground = this.state.flagBackground && backgroundColour % 4 != 0;
+        boolean renderSprites = this.state.flagSprites && spriteColour % 4 != 0;
+        if (renderBackground && !renderSprites) {
+            colour = backgroundColour;
+        } else if (renderSprites && !renderBackground) {
+            colour = spriteColour | 0x10;
+        } else if (renderBackground && renderSprites) {
+            if (sprite.getOamIndex() == 0 && x  < 255) {//TODO: Why < 255?
+                this.state.flagSpriteZeroHit = true;
+            }
+
+            if (sprite.getPriority() == 0) {
+                colour = spriteColour | 0x10; //TODO: Why | 0x10?
+            } else {
+                colour = backgroundColour;
+            }
         }
         
-        this.state.backbuffer[y * 256 + x] = this.console.getPpu().getState().palleteData[background] % 64;
+        this.state.backbuffer[y * 256 + x] = this.console.getPpu().getState().palleteData[colour] % 64;
     }
 
     public int readRegister(int address) {
@@ -60,7 +102,7 @@ public class Ppu {
                 return value;
             }
             case 0x2004:
-                break;
+                return this.state.oamData[this.state.regOamAddr];
             case 0x2007: {
                 int value = this.memory.read1(this.state.regV);
 
@@ -114,6 +156,8 @@ public class Ppu {
                 this.state.regOamAddr = value;
                 break;
             case 0x2004:
+                this.state.oamData[this.state.regOamAddr] = value;
+                this.state.regOamAddr++;
                 break;
             case 0x2005:
                 //PPUSCROLL
@@ -230,6 +274,10 @@ public class Ppu {
         boolean fetchCycle = (this.state.dot >= 1 && this.state.dot <= 256) || //Visible cycles
                 (this.state.dot >= 321 && this.state.dot <= 336);   //Pre-fetch cycles
 
+        if (this.state.dot == 1) {
+            Arrays.fill(this.state.oamData, (byte) 0);
+        }
+
         if (fetchCycle) {
             this.state.tileData <<= 4;
             //TODO: Split up fetch into setting addr bus value and reading
@@ -243,7 +291,7 @@ public class Ppu {
                     int v = this.state.regV;
                     //Gets address of 32x32 region currently at
                     int address = 0x23C0 | (v & 0x0C00) | ((v >> 4) & 0x38) | ((v >> 2) & 0x07);
-                    //Maybe? Gets the shift to get the two bit palette id for the block (16x16)
+                    //Gets the shift to get the two bit palette id for the block (16x16)
                     int shift = ((v >> 4) & 4) | (v & 2);
                     this.state.attribTableByte = ((this.memory.read1(address) >> shift) & 3) << 2;
                     break;
@@ -286,6 +334,86 @@ public class Ppu {
         }
     }
 
+    public int getSpritePattern(int tile, int attrib, int row) {
+        int address;
+        if (this.state.flagSpriteSize == 1) { //8x16
+            if ((attrib & 0x80) == 0x80) { //Flip vertically
+                row = 15 - row;
+            }
+
+            int table = tile & 1;
+            tile &= 0xFE;
+            if (row > 7) {
+                tile++;
+                row -= 8;
+            }
+            address = 0x1000 * table + 16 * tile  + row;
+        } else { //8x8
+            if ((attrib & 0x80) == 0x80) { //Flip vertically
+                row = 7 - row;
+            }
+
+            address = 0x1000 * this.state.flagPatternTable + 16 * tile + row;
+        }
+
+        int palette = attrib & 0x03;
+        int low = this.memory.read1(address);
+        int high = this.memory.read1(address + 8);
+
+        int data = 0;
+        for (int i = 0; i < 8; i++) {
+            int p1, p2;
+            if ((attrib & 0x40) == 0x40) { //Flip horizontally
+                p1 = low & 0x01;
+                p2 = (high & 0x01) << 1;
+                low >>= 1;
+                high >>= 1;
+            } else {
+                p1 = (low & 0x80) >> 7;
+                p2 = (high & 0x80) >> 6;
+                low <<= 1;
+                high <<= 1;
+            }
+
+            data |= (palette << 2) | p1 | p2;
+        }
+
+        return data;
+    }
+
+    public void evaluateSprites()   {
+        int size = (this.state.flagSpriteSize == 1) ? 16 : 8;
+
+        int count = 0;
+
+        for (int i = 0; i < 64; i++) {
+            int y = this.state.oamData[i * 4];
+            int tile = this.state.oamData[i * 4 + 1];
+            int attrib = this.state.oamData[i * 4 + 2];
+            int x = this.state.oamData[i * 4 + 3];
+
+
+            int diff = this.state.scanline - y;
+
+            if (diff >= 0 && diff < size) {
+                if (count < 8) {
+                    Sprite sprite = this.state.sprites[count];
+                    sprite.setOamIndex(i);
+                    sprite.setX(x);
+                    sprite.setPriority((attrib >> 5) & 0x01);
+                    int pattern = getSpritePattern(tile, attrib, diff);
+                    sprite.setPattern(pattern);
+                    System.out.println(String.format("Sprite at (%X, %X) with pattern %08X", x, y, pattern));
+                }
+
+                count++;
+            }
+        }
+
+        this.state.spriteCount = (count <= 8) ? count : 8;
+        this.state.flagSpriteOverflow = count > 8;
+    }
+
     //https://wiki.nesdev.com/w/images/d/d1/Ntsc_timing.png
     public boolean tick() {
         boolean rerender = false;
@@ -293,6 +421,7 @@ public class Ppu {
         this.state.cycle++;
         this.state.dot++;
 
+        boolean shouldRender = this.state.flagBackground || this.state.flagSprites;
         if (this.state.dot == 341) {
             this.state.dot = 0;
             this.state.scanline++;
@@ -304,22 +433,28 @@ public class Ppu {
                 this.state.scanline = 0;
 
                 //Skip first dot of first scanline on odd frames
-                if ((this.state.flagBackground || this.state.flagSprites) && this.state.oddFrame) {
+                if (shouldRender && this.state.oddFrame) {
                     this.state.dot++;
                 }
                 this.state.oddFrame = !this.state.oddFrame;
             }
         }
 
+
+        if (shouldRender && this.state.dot == 257) {
+            if (this.state.scanline < 240) {
+                evaluateSprites();
+            } else {
+                this.state.spriteCount = 0;
+            }
+        }
+
         if (this.state.scanline == 261) {
             processPrerenderLine();
-        } else if (this.state.scanline < 240 && (this.state.flagBackground || this.state.flagSprites)) {
+        } else if (this.state.scanline < 240 && shouldRender) {
             //Visible scanline
             if (this.state.dot >= 1 && this.state.dot <= 256) {
                 renderPixel();
-                /*if (NesEmu.DEBUG) {
-                    rerender = true;
-                }*/
             }
             processRenderLine();
         } else if (this.state.scanline == 241 && this.state.dot == 1) {

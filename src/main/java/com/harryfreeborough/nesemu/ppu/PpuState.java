@@ -3,8 +3,11 @@ package com.harryfreeborough.nesemu.ppu;
 public class PpuState {
     
     public final byte[] nametableData = new byte[0x1000];
-    public final byte[] palleteData = new byte[0x20];
-    public final byte[] oamData = new byte[0x100];
+    public final int[] palleteData = new int[0x20];
+    public final int[] oamData = new int[0x100];
+
+    //Not object as this is quite speed critical
+    public final Sprite[] sprites = new Sprite[8];
 
     public final int[] backbuffer = new int[256 * 240];
     
@@ -24,6 +27,8 @@ public class PpuState {
     public int highTileByte;
 
     public long tileData;
+
+    public int spriteCount;
 
     public int regOamAddr;
     
@@ -57,5 +62,11 @@ public class PpuState {
     public boolean flagNmiOccurred;
     
     public int dataBuffer;
+
+    public PpuState() {
+        for (int i = 0; i < this.sprites.length; i++) {
+            this.sprites[i] = new Sprite();
+        }
+    }
     
 }
