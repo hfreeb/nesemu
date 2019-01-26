@@ -13,8 +13,8 @@ public class EmuFrame extends JFrame {
         JPanel panel = new EmuPanel(console);
         getContentPane().add(panel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(new Dimension(256 * 2, 240 * 2));
-        setMinimumSize(new Dimension(256 * 2, 240 * 2));
+        setSize(new Dimension(256 * 2 + 10, 240 * 2 + 30));
+        setMinimumSize(new Dimension(256 * 2 + 10, 240 * 2 + 30));
         pack();
         setVisible(true);
 
