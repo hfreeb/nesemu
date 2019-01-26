@@ -42,10 +42,6 @@ public class Ppu {
             backgroundColour = (tileData >> ((7 - this.state.regX) * 4)) & 0xF;
         }
     
-        if (backgroundColour >= 16 && backgroundColour % 4 == 0) {
-            backgroundColour -= 16;
-        }
-
         int spriteColour = 0;
 
         Sprite sprite = null;
@@ -62,7 +58,6 @@ public class Ppu {
                     continue;
                 }
 
-                System.out.println("Sprite hit at x=" + x + " Leftmost = " + this.state.flagLeftmostSprites);
                 break;
             }
         }
@@ -76,7 +71,7 @@ public class Ppu {
         } else if (renderSprites && !renderBackground) {
             colour = spriteColour | 0x10;
         } else if (renderBackground && renderSprites) {
-            if (sprite.getOamIndex() == 0 && x  < 255) {//TODO: Why < 255?
+            if (sprite.getOamIndex() == 0 && x < 255) {
                 this.state.flagSpriteZeroHit = true;
             }
 
@@ -114,11 +109,11 @@ public class Ppu {
                 } else {
                     this.state.dataBuffer = this.memory.read1(this.state.regV - 0x1000);
                 }
-
+    
                 if (this.state.flagAddressIncrement == 1) {
-                    this.state.regV += 32;
+                    this.state.regV = (this.state.regV + 32) & 0x7FFF;
                 } else {
-                    this.state.regV++;
+                    this.state.regV = (this.state.regV + 1) & 0x7FFF;
                 }
 
                 return value;
@@ -157,7 +152,7 @@ public class Ppu {
                 break;
             case 0x2004:
                 this.state.oamData[this.state.regOamAddr] = value;
-                this.state.regOamAddr++;
+                this.state.regOamAddr = (this.state.regOamAddr + 1) & 0xFF;
                 break;
             case 0x2005:
                 //PPUSCROLL
@@ -187,9 +182,9 @@ public class Ppu {
                 //PPUDATA
                 this.memory.write1(this.state.regV, value);
                 if (this.state.flagAddressIncrement == 1) {
-                    this.state.regV += 32;
+                    this.state.regV = (this.state.regV + 32) & 0x7FFF;
                 } else {
-                    this.state.regV++;
+                    this.state.regV = (this.state.regV + 1) & 0x7FFF;
                 }
                 break;
             case 0x4014:
@@ -197,8 +192,8 @@ public class Ppu {
                 int page = value << 8;
                 for (int i = 0; i <= 0xFF; i++) {
                     int data = this.console.getCpu().getMemory().read1(page | i);
-                    this.state.oamData[this.state.regOamAddr] = (byte) data;
-                    this.state.regOamAddr++;
+                    this.state.oamData[this.state.regOamAddr] = data;
+                    this.state.regOamAddr = (this.state.regOamAddr + 1) & 0xFF;
                 }
                 CpuState cpuState = this.console.getCpu().getState();
                 cpuState.cycles += 513 + ((cpuState.cycles % 2 == 1) ? 1 : 0); //514 if odd cycles, 513 otherwise
@@ -274,10 +269,6 @@ public class Ppu {
         boolean fetchCycle = (this.state.dot >= 1 && this.state.dot <= 256) || //Visible cycles
                 (this.state.dot >= 321 && this.state.dot <= 336);   //Pre-fetch cycles
 
-        if (this.state.dot == 1) {
-            Arrays.fill(this.state.oamData, (byte) 0);
-        }
-
         if (fetchCycle) {
             this.state.tileData <<= 4;
             //TODO: Split up fetch into setting addr bus value and reading
@@ -334,10 +325,10 @@ public class Ppu {
         }
     }
 
-    public int getSpritePattern(int tile, int attrib, int row) {
+    public int getSpritePattern(int tile, int attribs, int row) {
         int address;
         if (this.state.flagSpriteSize == 1) { //8x16
-            if ((attrib & 0x80) == 0x80) { //Flip vertically
+            if ((attribs & 0x80) == 0x80) { //Flip vertically
                 row = 15 - row;
             }
 
@@ -349,21 +340,21 @@ public class Ppu {
             }
             address = 0x1000 * table + 16 * tile  + row;
         } else { //8x8
-            if ((attrib & 0x80) == 0x80) { //Flip vertically
+            if ((attribs & 0x80) == 0x80) { //Flip vertically
                 row = 7 - row;
             }
 
             address = 0x1000 * this.state.flagPatternTable + 16 * tile + row;
         }
 
-        int palette = attrib & 0x03;
+        int palette = attribs & 0x03;
         int low = this.memory.read1(address);
         int high = this.memory.read1(address + 8);
 
         int data = 0;
         for (int i = 0; i < 8; i++) {
             int p1, p2;
-            if ((attrib & 0x40) == 0x40) { //Flip horizontally
+            if ((attribs & 0x40) == 0x40) { //Flip horizontally
                 p1 = low & 0x01;
                 p2 = (high & 0x01) << 1;
                 low >>= 1;
@@ -375,7 +366,8 @@ public class Ppu {
                 high <<= 1;
             }
 
-            data |= (palette << 2) | p1 | p2;
+            data <<= 4;
+            data |= (palette << 2) | p2 | p1;
         }
 
         return data;
@@ -389,9 +381,8 @@ public class Ppu {
         for (int i = 0; i < 64; i++) {
             int y = this.state.oamData[i * 4];
             int tile = this.state.oamData[i * 4 + 1];
-            int attrib = this.state.oamData[i * 4 + 2];
+            int attribs = this.state.oamData[i * 4 + 2];
             int x = this.state.oamData[i * 4 + 3];
-
 
             int diff = this.state.scanline - y;
 
@@ -400,18 +391,21 @@ public class Ppu {
                     Sprite sprite = this.state.sprites[count];
                     sprite.setOamIndex(i);
                     sprite.setX(x);
-                    sprite.setPriority((attrib >> 5) & 0x01);
-                    int pattern = getSpritePattern(tile, attrib, diff);
+                    sprite.setPriority((attribs >> 5) & 0x01);
+                    int pattern = getSpritePattern(tile, attribs, diff);
                     sprite.setPattern(pattern);
-                    System.out.println(String.format("Sprite at (%X, %X) with pattern %08X", x, y, pattern));
                 }
 
                 count++;
             }
         }
 
-        this.state.spriteCount = (count <= 8) ? count : 8;
-        this.state.flagSpriteOverflow = count > 8;
+        if (count > 8) {
+            this.state.spriteCount = 8;
+            this.state.flagSpriteOverflow = true;
+        } else {
+            this.state.spriteCount = count;
+        }
     }
 
     //https://wiki.nesdev.com/w/images/d/d1/Ntsc_timing.png

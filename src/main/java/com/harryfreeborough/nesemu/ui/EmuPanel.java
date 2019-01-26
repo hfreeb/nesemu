@@ -14,8 +14,6 @@ public class EmuPanel extends JPanel {
         super();
 
         this.console = console;
-        setSize(new Dimension(256 * 2, 240 * 2));
-        setMinimumSize(new Dimension(256 * 2, 240 * 2));
     }
 
     @Override

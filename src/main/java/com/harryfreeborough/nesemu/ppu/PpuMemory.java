@@ -22,14 +22,22 @@ public class PpuMemory implements Memory {
 
         Cartridge cartridge = this.console.getCartridge();
         PpuState state = this.console.getPpu().getState();
+        int value = 0;
         if (address < 0x2000) {
-            return Byte.toUnsignedInt(cartridge.getChrRomData()[address]);
+            value = Byte.toUnsignedInt(cartridge.getChrRomData()[address]);
         } else if (address < 0x3F00) {
             MirroringMode mode = cartridge.getMirroringMode();
-            return Byte.toUnsignedInt(state.nametableData[mirrorAddress(mode, address % 2048)]);
+            value = Byte.toUnsignedInt(state.nametableData[mirrorAddress(mode, address % 2048)]);
         } else {
-            return state.palleteData[address % 0x20];
+            if (address >= 0x3F10 && address % 4 == 0) {
+                address -= 16;
+            }
+            value = state.palleteData[address % 0x20];
         }
+        
+        //Just verifying nothing has gone wrong
+        Preconditions.checkState(value < 0x100, "Value at $%04X has value $%X which is too large.", address, value);
+        return value;
     }
 
     @Override
@@ -47,6 +55,10 @@ public class PpuMemory implements Memory {
             MirroringMode mode = cartridge.getMirroringMode();
             state.nametableData[mirrorAddress(mode, address)] = (byte) value;
         } else if (address < 0x4000) { //TODO: Should just be else
+            if (address >= 0x3F10 && address % 4 == 0) {
+                address -= 16;
+            }
+            
             state.palleteData[address % 0x20] = (byte) value;
         }
 

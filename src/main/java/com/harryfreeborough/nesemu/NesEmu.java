@@ -14,7 +14,7 @@ public class NesEmu {
 
     public static Debugger DEBUGGER;
     
-    private static final long FRAME_TIME = Math.floorDiv(1000, 60);
+    private static final long FRAME_TIME = Math.floorDiv(1000, 30);
 
     public static void main(String[] args) {
         try {
@@ -32,6 +32,7 @@ public class NesEmu {
 
         Preconditions.checkState(data.getMapperId() == 0, "Only the NROM mapper is currently supported.");
         Preconditions.checkState(data.getChrRomSize() != 0, "CHR RAM is not supported.");
+        Preconditions.checkState(data.getPrgRomSize() != 0, "PRG RAM is not supported.");
 
         
         Console console = new Console(data);
