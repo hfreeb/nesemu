@@ -20,24 +20,18 @@ public class PpuMemory implements Memory {
         //Ignore 15th bit but anymore than that error on
         address &= 0x3FFF;
 
-        Cartridge cartridge = this.console.getCartridge();
         PpuState state = this.console.getPpu().getState();
-        int value = 0;
         if (address < 0x2000) {
             return this.console.getMapper().read1(address);
         } else if (address < 0x3F00) {
-            MirroringMode mode = cartridge.getMirroringMode();
-            value = Byte.toUnsignedInt(state.nametableData[mirrorAddress(mode, address % 2048)]);
+            MirroringMode mode = console.getMapper().getMirroringMode();
+            return Byte.toUnsignedInt(state.nametableData[mirrorAddress(mode, address % 2048)]);
         } else {
             if (address >= 0x3F10 && address % 4 == 0) {
                 address -= 16;
             }
-            value = state.palleteData[address % 0x20];
+            return state.palleteData[address % 0x20];
         }
-        
-        //Just verifying nothing has gone wrong
-        Preconditions.checkState(value < 0x100, "Value at $%04X has value $%X which is too large.", address, value);
-        return value;
     }
 
     @Override
@@ -47,12 +41,11 @@ public class PpuMemory implements Memory {
         //Ignore 15th bit but anymore than that error on
         address &= 0x3FFF;
 
-        Cartridge cartridge = this.console.getCartridge();
         PpuState state = this.console.getPpu().getState();
         if (address < 0x2000) {
-            cartridge.getChrRomData()[address] = (byte) value;
+            this.console.getCartridge().getChrRomData()[address] = (byte) value;
         } else if (address < 0x3000) {
-            MirroringMode mode = cartridge.getMirroringMode();
+            MirroringMode mode = this.console.getMapper().getMirroringMode();
             state.nametableData[mirrorAddress(mode, address)] = (byte) value;
         } else if (address < 0x4000) { //TODO: Should just be else
             if (address >= 0x3F10 && address % 4 == 0) {
@@ -61,7 +54,6 @@ public class PpuMemory implements Memory {
             
             state.palleteData[address % 0x20] = (byte) value;
         }
-
     }
 
     private int mirrorAddress(MirroringMode mode, int address) {
