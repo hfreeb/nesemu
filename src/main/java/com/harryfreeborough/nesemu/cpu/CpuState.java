@@ -15,8 +15,6 @@ public class CpuState {
 
     public boolean flagStrobe;
 
-    //CPU Cycles that need to be catched up on by other devices
-    //(i.e. PPU, APU and controller processor, WE it is called /TODO)
     public int cycles;
     
     //16-bit program counter
@@ -32,10 +30,7 @@ public class CpuState {
     public int regX;
     public int regY;
     
-    //16-bit memory address register for internal use to make things easier
-    //TODO: Kind of hacky, possibly change design of AddressingMode to avoid this
-    //(previously calling read1 and write1 in one instruction would not work for
-    // modes which pop from program memory)
+    //16-bit memory address register for internal use
     public int regMar;
     
     //Carry flag - Enables multi-byte arithmetic operations and indicates whether
