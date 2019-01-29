@@ -4,15 +4,16 @@ import com.harryfreeborough.nesemu.utils.FileReader;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class RomReader {
-    
-    private RomReader() {}
-    
-    public static Optional<Cartridge> read(Path path) {
-        try (FileReader reader = new FileReader(path)) {
+
+    public static Optional<Cartridge> read(InputStream stream) {
+        try (FileReader reader = new FileReader(stream)) {
             int[] verification = {'N', 'E', 'S', 0x1A};
             for (int i = 0; i < verification.length; i++) {
                 Preconditions.checkState(reader.readByte() == verification[i], "Failed to verify file format");
@@ -53,5 +54,5 @@ public class RomReader {
         
         return Optional.empty();
     }
-    
+
 }
