@@ -5,9 +5,6 @@ import com.harryfreeborough.nesemu.utils.Preconditions;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class RomReader {
@@ -42,11 +39,17 @@ public class RomReader {
             }
             
             byte[] prgRomData = reader.readBytes(0x4000 * prgRomSize);
-            byte[] chrRomData = reader.readBytes(0x2000 * chrRomSize);
+            
+            byte[] chrData;
+            if (chrRomSize != 0) {
+                chrData = reader.readBytes(0x2000 * chrRomSize);
+            } else {
+                chrData = new byte[0x2000]; //Provide CHR-RAM
+            }
             
             return Optional.of(
                     new Cartridge(mirroringMode, persistentMemory, mapperId, prgRomSize, chrRomSize,
-                                trainerData, prgRomData, chrRomData)
+                                trainerData, prgRomData, chrData)
             );
         } catch (IOException e) {
             e.printStackTrace();
