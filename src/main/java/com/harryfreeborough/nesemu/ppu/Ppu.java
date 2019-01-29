@@ -271,7 +271,6 @@ public class Ppu {
 
         if (fetchCycle) {
             this.state.tileData <<= 4;
-            //TODO: Split up fetch into setting addr bus value and reading
             switch ((this.state.dot - 1) % 8) {
                 case 0: { //NT Byte
                     int address = 0x2000 | (this.state.regV & 0x0FFF);

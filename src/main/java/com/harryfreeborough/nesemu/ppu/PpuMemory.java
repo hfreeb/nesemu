@@ -47,7 +47,7 @@ public class PpuMemory implements Memory {
         } else if (address < 0x3000) {
             MirroringMode mode = this.console.getMapper().getMirroringMode();
             state.nametableData[mirrorAddress(mode, address)] = (byte) value;
-        } else if (address < 0x4000) { //TODO: Should just be else
+        } else {
             if (address >= 0x3F10 && address % 4 == 0) {
                 address -= 16;
             }
