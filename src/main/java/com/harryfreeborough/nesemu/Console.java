@@ -5,16 +5,19 @@ import com.harryfreeborough.nesemu.cpu.CpuMemory;
 import com.harryfreeborough.nesemu.ppu.Ppu;
 import com.harryfreeborough.nesemu.ppu.PpuMemory;
 import com.harryfreeborough.nesemu.rom.Cartridge;
+import com.harryfreeborough.nesemu.rom.Mapper;
+import com.harryfreeborough.nesemu.rom.Mapper0;
 
 public class Console {
     
     private final Cpu cpu;
     private final Ppu ppu;
-    private final Cartridge cartridge;
-    
+    private Cartridge cartridge;
+    private Mapper mapper;
+
     public Console(Cartridge cartridge) {
-        this.cartridge = cartridge;
-        
+        setCartridge(cartridge);
+
         CpuMemory cpuMemory = new CpuMemory(this);
         this.cpu = new Cpu(cpuMemory);
         
@@ -27,7 +30,7 @@ public class Console {
     public void reset() {
         this.cpu.reset();
     }
-    
+
     public Cpu getCpu() {
         return this.cpu;
     }
@@ -39,5 +42,23 @@ public class Console {
     public Cartridge getCartridge() {
         return this.cartridge;
     }
-    
+
+    public void setCartridge(Cartridge cartridge) {
+        this.cartridge = cartridge;
+
+        switch (this.cartridge.getMapperId()) {
+            case 0:
+                this.mapper = new Mapper0(this);
+                break;
+            default:
+                throw new IllegalStateException(
+                        String.format("Mapper %d not supported.", this.cartridge.getMapperId())
+                );
+        }
+    }
+
+    public Mapper getMapper() {
+        return this.mapper;
+    }
+
 }

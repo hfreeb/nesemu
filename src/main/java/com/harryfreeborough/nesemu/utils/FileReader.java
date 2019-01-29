@@ -12,8 +12,8 @@ public class FileReader implements AutoCloseable {
     private int currentByte;
     private int bitIndex;
     
-    public FileReader(Path path) throws IOException {
-        this.stream = Files.newInputStream(path);
+    public FileReader(InputStream stream) throws IOException {
+        this.stream = stream;
     }
     
     public int readByte() throws IOException {

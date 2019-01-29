@@ -21,7 +21,6 @@ public class CpuMemory implements Memory {
         Preconditions.checkArgument(address <= 0xFFFF, "Address out of range.");
     
         CpuState state = this.console.getCpu().getState();
-        Cartridge cartridge = this.console.getCartridge();
         if (address < 0x2000) {
             return Byte.toUnsignedInt(state.internalRam[address % 0x800]);
         } else if (address < 0x4000) {
@@ -42,16 +41,8 @@ public class CpuMemory implements Memory {
             return 0;
         } else if (address < 0x4020) {
             //APU and I/O registers
-        } else if (address < 0x8000) {
-            //Ignore
-        } else if (address < 0xC000) {
-            //First 16KiB of ROM
-            return Byte.toUnsignedInt(cartridge.getPrgRomData()[address % 0x4000]);
         } else {
-            //Last 16KiB of ROM
-            return Byte.toUnsignedInt(
-                    cartridge.getPrgRomData()[(cartridge.getPrgRomSize() - 1) * 0x4000 + address % 0x4000]
-            );
+            return this.console.getMapper().read1(address);
         }
         
         throw new IllegalStateException(String.format("Failed to read from address $%02X", address));
@@ -79,10 +70,10 @@ public class CpuMemory implements Memory {
                     state.buttonStateCache.offer(i);
                 }
             }
-        } else if (address < 0x6000) {
+        } else if (address < 0x4020) {
             //I/O and audio registers
         } else {
-            throw new IllegalStateException(String.format("Failed to write to address $%02X", address));
+            this.console.getMapper().write1(address, value);
         }
         
     }

@@ -7,7 +7,10 @@ import com.harryfreeborough.nesemu.ui.EmuFrame;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
 import javax.swing.*;
-import java.nio.file.Paths;
+import javax.swing.filechooser.FileSystemView;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Optional;
 
 public class NesEmu {
@@ -18,29 +21,41 @@ public class NesEmu {
 
     public static void main(String[] args) {
         try {
-            new NesEmu().run(args[0]);
+            new NesEmu().run();
         } catch (Exception ex) {
-            DEBUGGER.write(); //A bit risky if the exception causes the debugger to not initialise
+            if (DEBUGGER != null) {
+                DEBUGGER.write();
+            }
             ex.printStackTrace();
-            System.exit(1);
         }
     }
 
-    public void run(String romPath) {
-        Cartridge data = RomReader.read(Paths.get(romPath))
+    public void run() {
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        int jfcVal = jfc.showOpenDialog(null);
+        if(jfcVal != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        InputStream stream;
+        try {
+            stream =  new FileInputStream(jfc.getSelectedFile());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        Cartridge data = RomReader.read(stream)
                 .orElseThrow(() -> new RuntimeException("Failed to read rom."));
 
-        Preconditions.checkState(data.getMapperId() == 0, "Only the NROM mapper is currently supported.");
-        Preconditions.checkState(data.getChrRomSize() != 0, "CHR RAM is not supported.");
-        Preconditions.checkState(data.getPrgRomSize() != 0, "PRG RAM is not supported.");
 
-        
         Console console = new Console(data);
         DEBUGGER = new Debugger(console);
         
         Cpu cpu = console.getCpu();
 
         EmuFrame frame = new EmuFrame(console);
+
 
         long lastFrame = 0;
         int cycles = 0;
