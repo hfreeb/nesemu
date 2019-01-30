@@ -13,7 +13,7 @@ public class Mapper1 implements Mapper {
     private int controlReg; //Only stored for resetting with control = (control | 0xC0)
     
     //0, 1: switch all 32KiB, 2: fix lower and switch upper, 3: fix upper bank and switch lower
-    private int prgBankMode = 3;
+    private int prgBankMode;
     //0: switch single 8KiB bank, 1: switch two separate 4KiB banks
     private int chrBankMode;
     
@@ -24,6 +24,8 @@ public class Mapper1 implements Mapper {
     public Mapper1(Cartridge cartridge) {
         this.cartridge = cartridge;
         this.mirroringMode = this.cartridge.getMirroringMode();
+
+        writeControl(0x0C);
     }
     
     @Override
@@ -71,8 +73,8 @@ public class Mapper1 implements Mapper {
             
             return Byte.toUnsignedInt(this.cartridge.getPrgRomData()[bank * 0x4000 + (address % 0x4000)]);
         }
-        
-        return 0;
+
+        throw new IllegalStateException(String.format("Failed to read from address $%04X", address));
     }
     
     @Override
