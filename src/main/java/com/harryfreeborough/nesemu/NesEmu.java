@@ -16,7 +16,7 @@ import java.util.Optional;
 public class NesEmu {
 
     public static Debugger DEBUGGER;
-    
+
     private static final long FRAME_TIME = Math.floorDiv(1000, 30);
 
     public static void main(String[] args) {
@@ -33,13 +33,13 @@ public class NesEmu {
     public void run() {
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         int jfcVal = jfc.showOpenDialog(null);
-        if(jfcVal != JFileChooser.APPROVE_OPTION) {
+        if (jfcVal != JFileChooser.APPROVE_OPTION) {
             return;
         }
 
         InputStream stream;
         try {
-            stream =  new FileInputStream(jfc.getSelectedFile());
+            stream = new FileInputStream(jfc.getSelectedFile());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;
@@ -51,7 +51,7 @@ public class NesEmu {
 
         Console console = new Console(data);
         DEBUGGER = new Debugger(console);
-        
+
         Cpu cpu = console.getCpu();
 
         EmuFrame frame = new EmuFrame(console);
@@ -59,26 +59,26 @@ public class NesEmu {
 
         long lastFrame = 0;
         int cycles = 0;
-        
+
         Optional<Integer> breakpoint = DEBUGGER.getTargetPc();
         while (true) {
             if (breakpoint.isPresent() && (breakpoint.get() == cpu.getState().regPc)) {
                 System.out.println(String.format("BREAK at $%04X", cpu.getState().regPc));
                 DEBUGGER.pause();
             }
-            
+
             if (DEBUGGER.isPaused()) {
                 if (!DEBUGGER.processPause()) {
                     continue;
                 }
             }
-            
+
             //Break on halt
             if (!cpu.tick()) {
                 DEBUGGER.pause();
                 continue;
             }
-            
+
             int catchup = (cpu.getState().cycles - cycles) * 3;
 
             for (int i = 0; i < catchup; i++) {
