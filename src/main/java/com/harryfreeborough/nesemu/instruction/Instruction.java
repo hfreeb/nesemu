@@ -1,19 +1,19 @@
 package com.harryfreeborough.nesemu.instruction;
 
-import com.harryfreeborough.nesemu.utils.MemoryUtils;
-
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.setNZFlags;
 
+import com.harryfreeborough.nesemu.utils.MemoryUtils;
+
 public enum Instruction {
-    
+
     ADC((bus, state, mode) -> {
         int a = state.regA;
         int value = mode.read1(bus, state);
         int result = a + value + (state.flagC ? 1 : 0);
-        
+
         state.flagC = (result >> 8) != 0;
         state.regA = setNZFlags(state, result & 0xFF);
-        
+
         state.flagV = (((a ^ value) & 0x80) == 0) &&
                 (((a ^ state.regA) & 0x80) != 0);
     }),
@@ -21,10 +21,10 @@ public enum Instruction {
         int a = state.regA;
         int value = mode.read1(bus, state);
         int result = a - value - (1 - (state.flagC ? 1 : 0));
-        
+
         state.flagC = (result >> 8) == 0;
         state.regA = setNZFlags(state, result & 0xFF);
-        
+
         state.flagV = (((a ^ value) & 0x80) != 0) &&
                 (((a ^ state.regA) & 0x80) != 0);
     }),
@@ -35,7 +35,7 @@ public enum Instruction {
         int value = mode.read1(bus, state);
         int carry = state.flagC ? 1 : 0;
         state.flagC = (value >> 7) == 1;
-        
+
         int result = ((value << 1) | carry) & 0xFF;
         mode.write1(bus, state, setNZFlags(state, result));
     }),
@@ -43,7 +43,7 @@ public enum Instruction {
         int value = mode.read1(bus, state);
         int carry = state.flagC ? 1 : 0;
         state.flagC = (value & 0x01) == 0x01;
-        
+
         int result = (carry << 7) | (value >> 1);
         mode.write1(bus, state, setNZFlags(state, result));
     }),
@@ -54,7 +54,7 @@ public enum Instruction {
     CMP(InstructionProcessor.compare(state -> state.regA)),
     CPX(InstructionProcessor.compare(state -> state.regX)),
     CPY(InstructionProcessor.compare(state -> state.regY)),
-    
+
     BEQ(InstructionProcessor.branch(state -> state.flagZ)),
     BNE(InstructionProcessor.branch(state -> !state.flagZ)),
     BMI(InstructionProcessor.branch(state -> state.flagN)),
@@ -63,7 +63,7 @@ public enum Instruction {
     BCC(InstructionProcessor.branch(state -> !state.flagC)),
     BVS(InstructionProcessor.branch(state -> state.flagV)),
     BVC(InstructionProcessor.branch(state -> !state.flagV)),
-    
+
     LDX(InstructionProcessor.load((state, value) -> state.regX = value)),
     LDY(InstructionProcessor.load((state, value) -> state.regY = value)),
     INY((bus, state, mode) -> state.regY = setNZFlags(state, (state.regY + 1) & 0xFF)),
@@ -105,7 +105,7 @@ public enum Instruction {
         int old = mode.read1(bus, state);
         state.flagC = (old & 0x80) != 0;
         int result = setNZFlags(state, (old << 1) & 0xFF);
-        
+
         mode.write1(bus, state, result);
     }),
     PHA((bus, state, mode) -> MemoryUtils.stackPush1(state.regA, bus, state)),
@@ -120,15 +120,15 @@ public enum Instruction {
     NOP((bus, state, mode) -> { /* NOP */ }),
     /* Unofficial opcodes */
     RLA(InstructionProcessor.combination(ROL, AND));
-    
+
     private final InstructionProcessor processor;
-    
+
     Instruction(InstructionProcessor processor) {
         this.processor = processor;
     }
-    
+
     public InstructionProcessor getProcessor() {
         return processor;
     }
-    
+
 }

@@ -4,13 +4,13 @@ import com.harryfreeborough.nesemu.rom.Cartridge;
 import com.harryfreeborough.nesemu.rom.MirroringMode;
 
 public class Mapper0 implements Mapper {
-    
+
     private final Cartridge cartridge;
-    
+
     public Mapper0(Cartridge cartridge) {
         this.cartridge = cartridge;
     }
-    
+
     @Override
     public int read1(int address) {
         if (address < 0x2000) { //PPU memmory
@@ -23,22 +23,22 @@ public class Mapper0 implements Mapper {
                     this.cartridge.getPrgRomData()[(this.cartridge.getPrgRomSize() - 1) * 0x4000 + address % 0x4000]
             );
         }
-        
+
         throw new IllegalArgumentException(String.format("Failed to read from address $%04X", address));
     }
-    
+
     @Override
     public void write1(int address, int value) {
-//        if (address < 0x2000) { //PPU memory
-//            this.cartridge.getChrRomData()[address] = (byte) value;
-//        } else {
+        //        if (address < 0x2000) { //PPU memory
+        //            this.cartridge.getChrRomData()[address] = (byte) value;
+        //        } else {
         throw new IllegalArgumentException(String.format("Failed to write to address $%04X", address));
-//        }
+        //        }
     }
-    
+
     @Override
     public MirroringMode getMirroringMode() {
         return this.cartridge.getMirroringMode();
     }
-    
+
 }

@@ -9,20 +9,20 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class CpuMemory implements Memory {
-    
+
     public final boolean[] buttonState = new boolean[8];
     public final Queue<Boolean> buttonStateCache = new LinkedList<>();
     private final Console console;
-    
-    
+
+
     public CpuMemory(Console console) {
         this.console = console;
     }
-    
+
     @Override
     public int read1(int address) {
         Preconditions.checkArgument(address <= 0xFFFF, "Address out of range.");
-        
+
         CpuState state = this.console.getCpu().getState();
         if (address < 0x2000) {
             return Byte.toUnsignedInt(state.internalRam[address % 0x800]);
@@ -37,7 +37,7 @@ public class CpuMemory implements Memory {
                 if (val != null) {
                     i = val ? 1 : 0;
                 }
-                
+
                 return 0x40 | i;
             }
         } else if (address == 0x4017) {
@@ -47,15 +47,15 @@ public class CpuMemory implements Memory {
         } else {
             return this.console.getMapper().read1(address);
         }
-        
+
         throw new IllegalStateException(String.format("Failed to read from address $%02X", address));
     }
-    
+
     @Override
     public void write1(int address, int value) {
         Preconditions.checkArgument(address <= 0xFFFF, "Address out of range.");
         Preconditions.checkArgument(value <= 0xFF, "Value too large.");
-        
+
         CpuState state = this.console.getCpu().getState();
         if (address < 0x2000) {
             state.internalRam[address % 0x800] = (byte) value;
@@ -79,9 +79,9 @@ public class CpuMemory implements Memory {
             this.console.getMapper().write1(address, value);
         }
     }
-    
+
     public void setButtonState(int button, boolean value) {
         this.buttonState[button] = value;
     }
-    
+
 }
