@@ -20,7 +20,7 @@ public class EmuPanel extends JPanel {
     public void paint(Graphics g) {
         for (int x = 0; x < 256; x++) {
             for (int y = 0; y < 240; y++) {
-                g.setColor(new Color(Pallete.getRgb(this.console.getPpu().getState().backbuffer[y * 256 + x] ), false));
+                g.setColor(new Color(Pallete.getRgb(this.console.getPpu().getState().backbuffer[y * 256 + x]), false));
                 g.fillRect(x * 2, y * 2, 2, 2);
             }
         }

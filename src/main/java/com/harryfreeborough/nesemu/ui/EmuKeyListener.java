@@ -1,82 +1,64 @@
 package com.harryfreeborough.nesemu.ui;
 
-import com.harryfreeborough.nesemu.cpu.CpuState;
+import com.harryfreeborough.nesemu.Console;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EmuKeyListener implements KeyListener {
 
-    private final CpuState cpuState;
+    private static final Map<Integer, Integer> KEY_MAPPING;
 
-    public EmuKeyListener(CpuState cpuState) {
-        this.cpuState = cpuState;
+    static {
+        Map<Integer, Integer> mapping = new HashMap<>();
+        mapping.put(KeyEvent.VK_Z, 0);
+        mapping.put(KeyEvent.VK_X, 1);
+        mapping.put(KeyEvent.VK_SPACE, 2);
+        mapping.put(KeyEvent.VK_ENTER, 3);
+        mapping.put(KeyEvent.VK_UP, 4);
+        mapping.put(KeyEvent.VK_DOWN, 5);
+        mapping.put(KeyEvent.VK_LEFT, 6);
+        mapping.put(KeyEvent.VK_RIGHT, 7);
+
+        KEY_MAPPING = Collections.unmodifiableMap(mapping);
+    }
+
+    private final Console console;
+
+    public EmuKeyListener(Console console) {
+        this.console = console;
     }
 
     @Override
-    public void keyTyped(KeyEvent keyEvent) {
+    public void keyTyped(KeyEvent event) {
 
     }
 
     @Override
-    public void keyPressed(KeyEvent keyEvent) {
-        boolean[] state = this.cpuState.buttonState;
-        switch (keyEvent.getKeyCode()) {
-            case KeyEvent.VK_Z:
-                state[0] = true;
-                break;
-            case KeyEvent.VK_X:
-                state[1] = true;
-                break;
-            case KeyEvent.VK_SPACE:
-                state[2] = true;
-                break;
-            case KeyEvent.VK_ENTER:
-                state[3] = true;
-                break;
-            case KeyEvent.VK_UP:
-                state[4] = true;
-                break;
-            case KeyEvent.VK_DOWN:
-                state[5] = true;
-                break;
-            case KeyEvent.VK_LEFT:
-                state[6] = true;
-                break;
-            case KeyEvent.VK_RIGHT:
-                state[7] = true;
-                break;
+    public void keyPressed(KeyEvent event) {
+        Integer button = KEY_MAPPING.get(event.getKeyCode());
+        if (button != null) {
+            this.console.getCpu().getMemory().setButtonState(button, true);
         }
     }
 
     @Override
-    public void keyReleased(KeyEvent keyEvent) {
-        boolean[] state = this.cpuState.buttonState;
+    public void keyReleased(KeyEvent event) {
+        Integer button = KEY_MAPPING.get(event.getKeyCode());
+        if (button != null) {
+            this.console.getCpu().getMemory().setButtonState(button, false);
+            return;
+        }
 
-        switch (keyEvent.getKeyCode()) {
-            case KeyEvent.VK_Z:
-                state[0] = false;
+        switch (event.getKeyCode()) {
+            case KeyEvent.VK_S:
+                this.console.queueSave();
                 break;
-            case KeyEvent.VK_X:
-                state[1] = false;
-                break;
-            case KeyEvent.VK_SPACE:
-                state[2] = false;
-                break;
-            case KeyEvent.VK_ENTER:
-                state[3] = false;
-                break;
-            case KeyEvent.VK_UP:
-                state[4] = false;
-                break;
-            case KeyEvent.VK_DOWN:
-                state[5] = false;
-                break;
-            case KeyEvent.VK_LEFT:
-                state[6] = false;
-                break;
-            case KeyEvent.VK_RIGHT:
-                state[7] = false;
+            case KeyEvent.VK_L:
+                this.console.loadSave();
                 break;
         }
     }

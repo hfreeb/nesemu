@@ -4,7 +4,6 @@ import com.harryfreeborough.nesemu.cpu.Cpu;
 import com.harryfreeborough.nesemu.rom.Cartridge;
 import com.harryfreeborough.nesemu.rom.RomReader;
 import com.harryfreeborough.nesemu.ui.EmuFrame;
-import com.harryfreeborough.nesemu.utils.Preconditions;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -15,9 +14,8 @@ import java.util.Optional;
 
 public class NesEmu {
 
-    public static Debugger DEBUGGER;
-
     private static final long FRAME_TIME = Math.floorDiv(1000, 30);
+    public static Debugger DEBUGGER;
 
     public static void main(String[] args) {
         try {
@@ -87,6 +85,8 @@ public class NesEmu {
                         frame.validate();
                         frame.repaint();
                     });
+
+                    console.frameEnd();
 
                     long now = System.currentTimeMillis();
                     long delta = now - lastFrame;

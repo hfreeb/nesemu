@@ -1,17 +1,17 @@
 package com.harryfreeborough.nesemu.instruction;
 
-import com.harryfreeborough.nesemu.cpu.CpuState;
 import com.harryfreeborough.nesemu.cpu.CpuMemory;
+import com.harryfreeborough.nesemu.cpu.CpuState;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
 public enum AddressingMode {
-    
+
     ACC("A") {
         @Override
         public int read1(CpuMemory bus, CpuState state) {
             return state.regA;
         }
-        
+
         @Override
         public void write1(CpuMemory bus, CpuState state, int value) {
             state.regA = value;
@@ -23,12 +23,12 @@ public enum AddressingMode {
         public int read1(CpuMemory bus, CpuState state) {
             return MemoryUtils.programPop1(bus, state);
         }
-        
+
         @Override
         public int obtainAddress(CpuMemory bus, CpuState state) {
             return state.regPc;
         }
-    
+
         @Override
         public void write1(CpuMemory bus, CpuState state, int value) {
             throw new UnsupportedOperationException("You can not write in immediate mode.");
@@ -114,27 +114,27 @@ public enum AddressingMode {
             return indexed;
         }
     };
-    
+
     private final String format;
-    
+
     AddressingMode(String format) {
         this.format = format;
     }
-    
+
     public String getFormat() {
         return format;
     }
-    
+
     public int obtainAddress(CpuMemory bus, CpuState state) {
         return state.regMar; //Do nothing by default (specifically for ACC, IMP modes)
     }
-    
+
     public int read1(CpuMemory bus, CpuState state) {
         return bus.read1(state.regMar);
     }
-    
+
     public void write1(CpuMemory bus, CpuState state, int value) {
         bus.write1(state.regMar, value);
     }
-    
+
 }

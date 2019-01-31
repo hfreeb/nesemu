@@ -16,29 +16,29 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class Debugger {
-    
-    private static boolean LOG = System.getProperty("debug-log") != null;
+
     private final static Integer BREAKPOINT;
-    
+    private static boolean LOG = System.getProperty("debug-log") != null;
+
     static {
         String value = System.getProperty("debug-target-pc");
         if (value != null) {
             BREAKPOINT = Integer.parseInt(value, 16);
         } else {
-           BREAKPOINT = null;
+            BREAKPOINT = null;
         }
     }
-    
+
     private final Console console;
     private final Scanner scanner;
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
     private boolean paused = false;
-    
+
     public Debugger(Console console) {
         this.console = console;
         this.scanner = new Scanner(System.in);
-        
+
         try {
             this.fileWriter = new FileWriter(Paths.get("latest.log").toFile());
             this.bufferedWriter = new BufferedWriter(this.fileWriter);
@@ -46,22 +46,22 @@ public class Debugger {
             e.printStackTrace();
         }
     }
-    
+
     public Optional<Integer> getTargetPc() {
         return Optional.ofNullable(BREAKPOINT);
     }
-    
+
     public boolean isPaused() {
         return this.paused;
     }
-    
+
     public void pause() {
         this.paused = true;
     }
-    
+
     public boolean processPause() {
         String[] input = this.scanner.nextLine().split(" ");
-        
+
         switch (input[0]) {
             case "s":
                 return true;
@@ -91,22 +91,22 @@ public class Debugger {
                 System.out.println("Invalid command");
                 break;
         }
-        
+
         return false;
     }
-    
+
     public void process(Operation operation) {
         if (!LOG && !paused) {
             return;
         }
-        
+
         //TODO: Clean this all up
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
-        
+
         CpuMemory cpuMemory = this.console.getCpu().getMemory();
         CpuState cpuState = this.console.getCpu().getState();
-        
+
         int argsLength = 0;
         String arguments = mode.getFormat();
         if (arguments.contains("$[1,2]")) {
@@ -118,9 +118,9 @@ public class Debugger {
             argsLength = 1;
             int arg = cpuMemory.read1(cpuState.regPc);
             arguments = arguments.replace("$[1]", String.format("$%02X", arg))
-                                 .replace("[1]", String.format("%d", MemoryUtils.signedByteToInt(arg)));
+                    .replace("[1]", String.format("%d", MemoryUtils.signedByteToInt(arg)));
         }
-    
+
         //TODO: Create function to convert number to n long padded out hex, should speed it up
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("%04X", cpuState.regPc - 1));
@@ -135,11 +135,11 @@ public class Debugger {
         builder.append(instruction.name());
         builder.append(" ");
         builder.append(arguments);
-    
+
         for (int i = builder.length(); i < 48; i++) {
             builder.append(" ");
         }
-    
+
         builder.append("A:");
         builder.append(String.format("%02X", cpuState.regA));
         builder.append(" X:");
@@ -150,14 +150,14 @@ public class Debugger {
         builder.append(String.format("%02X", cpuState.regPc));
         builder.append(" SP:");
         builder.append(String.format("%02X", cpuState.regSp));
-    
+
         builder.append(" S:");
         String status = Integer.toBinaryString(cpuState.getStatus());
         for (int i = status.length(); i < 8; i++) {
             builder.append("0");
         }
         builder.append(status);
-        
+
         builder.append(" PPU:");
         PpuState ppuState = this.console.getPpu().getState();
         String scanline = Integer.toString(ppuState.scanline);
@@ -176,15 +176,15 @@ public class Debugger {
         builder.append(" CYC:");
         builder.append(Integer.toString(cpuState.cycles));
         builder.append(" (");
-        builder.append(cpuState.cycles / (114*260*60));
+        builder.append(cpuState.cycles / (114 * 260 * 60));
         builder.append("s)");
-    
+
         if (this.paused) {
             System.out.println(builder.toString());
         }
-        
+
         builder.append("\n");
-    
+
         if (LOG) {
             try {
                 this.bufferedWriter.append(builder.toString());
@@ -193,7 +193,7 @@ public class Debugger {
             }
         }
     }
-    
+
     public void write() {
         try {
             this.bufferedWriter.close();
@@ -202,5 +202,5 @@ public class Debugger {
             e.printStackTrace();
         }
     }
-    
+
 }

@@ -18,7 +18,7 @@ public class EmuFrame extends JFrame {
         pack();
         setVisible(true);
 
-        addKeyListener(new EmuKeyListener(console.getCpu().getState()));
+        addKeyListener(new EmuKeyListener(console));
     }
 
 }
