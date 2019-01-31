@@ -1,7 +1,6 @@
 package com.harryfreeborough.nesemu.ppu;
 
 import com.harryfreeborough.nesemu.Console;
-import com.harryfreeborough.nesemu.rom.Cartridge;
 import com.harryfreeborough.nesemu.rom.MirroringMode;
 import com.harryfreeborough.nesemu.utils.Memory;
 import com.harryfreeborough.nesemu.utils.Preconditions;
@@ -66,6 +65,10 @@ public class PpuMemory implements Memory {
                 return address % 0x0800;
             case FOUR_SCREEN:
                 return address;
+            case SINGLE_LOW:
+                return address % 0x0400;
+            case SINGLE_HIGH:
+                return 0x400 + (address % 0x400);
         }
 
         throw new IllegalStateException(

@@ -123,10 +123,10 @@ public class Mapper1 implements Mapper {
         
         switch (value & 0x03) {
             case 0:
-                this.mirroringMode = MirroringMode.ONE_SCREEN_LOW;
+                this.mirroringMode = MirroringMode.SINGLE_LOW;
                 break;
             case 1:
-                this.mirroringMode = MirroringMode.ONE_SCREEN_UPPER;
+                this.mirroringMode = MirroringMode.SINGLE_HIGH;
                 break;
             case 2:
                 this.mirroringMode = MirroringMode.VERTICAL;
