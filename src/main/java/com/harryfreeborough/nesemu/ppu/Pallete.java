@@ -1,7 +1,5 @@
 package com.harryfreeborough.nesemu.ppu;
 
-import java.awt.*;
-
 public class Pallete {
 
     private static final int[] colours = {

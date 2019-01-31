@@ -13,57 +13,57 @@ import java.util.Map;
 public class Cpu {
 
     private static Map<Integer, Operation> operations;
-    
+
     static {
         operations = new HashMap<>();
         for (Operation operation : Operation.values()) {
             operations.put(operation.getOpcode(), operation);
         }
     }
-    
+
     private final CpuMemory bus;
-    private final CpuState state;
-    
+    private CpuState state;
+
     public Cpu(CpuMemory bus) {
         this.bus = bus;
-        
+
         this.state = new CpuState();
     }
-    
+
     public boolean tick() {
         int opcode = MemoryUtils.programPop1(this.bus, this.state);
-        
+
         if (opcode == 0) {
             System.out.println("HALTING");
             return false;
         }
-        
+
         Operation operation = operations.get(opcode);
         Preconditions.checkNotNull(operation, "Failed to find instruction with id: $%02X", opcode);
-        
+
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
 
         NesEmu.DEBUGGER.process(operation);
-        
+
         this.state.regMar = mode.obtainAddress(this.bus, this.state);
         instruction.getProcessor().execute(this.bus, this.state, mode);
         this.state.cycles += operation.getCycles();
-        
+
         return true;
     }
-    
+
     public void raiseNmi() {
         MemoryUtils.stackPush2(this.state.regPc, this.bus, this.state);
         MemoryUtils.stackPush1(this.state.getStatus(), this.bus, this.state);
-        
+
         this.state.regPc = this.bus.read2(0xFFFA);
     }
-    
+
     public void reset() {
         this.state.regPc = this.bus.read2(0xFFFC);
         this.state.regSp = 0xFD;
-        
+
         this.state.flagC = false;
         this.state.flagZ = false;
         this.state.flagI = true;
@@ -73,13 +73,14 @@ public class Cpu {
         this.state.flagV = false;
         this.state.flagN = false;
     }
-    
+
     public CpuMemory getMemory() {
         return this.bus;
     }
-    
+
     public CpuState getState() {
         return this.state;
     }
-    
+
+
 }

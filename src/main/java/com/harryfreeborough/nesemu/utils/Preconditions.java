@@ -1,7 +1,7 @@
 package com.harryfreeborough.nesemu.utils;
 
 public class Preconditions {
-    
+
     private Preconditions() {
     }
 
@@ -16,11 +16,11 @@ public class Preconditions {
             throw new IllegalStateException(String.format(format, args));
         }
     }
-    
+
     public static void checkNotNull(Object obj, String format, Object... args) {
         if (obj == null) {
             throw new NullPointerException(String.format(format, args));
         }
     }
-    
+
 }

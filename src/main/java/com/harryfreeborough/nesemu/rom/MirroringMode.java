@@ -1,11 +1,11 @@
 package com.harryfreeborough.nesemu.rom;
 
 public enum MirroringMode {
-    
-    SINGLE_LOW,
-    SINGLE_HIGH,
+
+    ONE_SCREEN_LOW,
+    ONE_SCREEN_UPPER,
     HORIZONTAL,
     VERTICAL,
     FOUR_SCREEN
-    
+
 }

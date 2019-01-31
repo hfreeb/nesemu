@@ -1,13 +1,12 @@
 package com.harryfreeborough.nesemu.mapper;
 
-import com.harryfreeborough.nesemu.Console;
 import com.harryfreeborough.nesemu.rom.Cartridge;
 import com.harryfreeborough.nesemu.rom.MirroringMode;
 
 public class Mapper0 implements Mapper {
 
     private final Cartridge cartridge;
-    
+
     public Mapper0(Cartridge cartridge) {
         this.cartridge = cartridge;
     }
@@ -33,13 +32,13 @@ public class Mapper0 implements Mapper {
 //        if (address < 0x2000) { //PPU memory
 //            this.cartridge.getChrRomData()[address] = (byte) value;
 //        } else {
-            throw new IllegalArgumentException(String.format("Failed to write to address $%04X", address));
+        throw new IllegalArgumentException(String.format("Failed to write to address $%04X", address));
 //        }
     }
-    
+
     @Override
     public MirroringMode getMirroringMode() {
         return this.cartridge.getMirroringMode();
     }
-    
+
 }

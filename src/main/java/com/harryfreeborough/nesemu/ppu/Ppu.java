@@ -3,8 +3,6 @@ package com.harryfreeborough.nesemu.ppu;
 import com.harryfreeborough.nesemu.Console;
 import com.harryfreeborough.nesemu.cpu.CpuState;
 
-import java.util.Arrays;
-
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.shiftBit;
 
@@ -41,7 +39,7 @@ public class Ppu {
             int tileData = (int) (this.state.tileData >> 32);
             backgroundColour = (tileData >> ((7 - this.state.regX) * 4)) & 0xF;
         }
-    
+
         int spriteColour = 0;
 
         Sprite sprite = null;
@@ -81,7 +79,7 @@ public class Ppu {
                 colour = backgroundColour;
             }
         }
-        
+
         this.state.backbuffer[y * 256 + x] = this.console.getPpu().getState().palleteData[colour] % 64;
     }
 
@@ -109,7 +107,7 @@ public class Ppu {
                 } else {
                     this.state.dataBuffer = this.memory.read1(this.state.regV - 0x1000);
                 }
-    
+
                 if (this.state.flagAddressIncrement == 1) {
                     this.state.regV = (this.state.regV + 32) & 0x7FFF;
                 } else {
@@ -252,7 +250,7 @@ public class Ppu {
     private void calculateTileData() {
         int data = 0;
         for (int i = 0; i < 8; i++) {
-            data  <<= 4;
+            data <<= 4;
 
             data |= this.state.attribTableByte
                     | ((this.state.lowTileByte & 0x80) >> 7)
@@ -337,7 +335,7 @@ public class Ppu {
                 tile++;
                 row -= 8;
             }
-            address = 0x1000 * table + 16 * tile  + row;
+            address = 0x1000 * table + 16 * tile + row;
         } else { //8x8
             if ((attribs & 0x80) == 0x80) { //Flip vertically
                 row = 7 - row;
@@ -372,7 +370,7 @@ public class Ppu {
         return data;
     }
 
-    public void evaluateSprites()   {
+    public void evaluateSprites() {
         int size = (this.state.flagSpriteSize == 1) ? 16 : 8;
 
         int count = 0;

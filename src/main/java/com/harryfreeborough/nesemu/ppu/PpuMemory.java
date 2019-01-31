@@ -50,7 +50,7 @@ public class PpuMemory implements Memory {
             if (address >= 0x3F10 && address % 4 == 0) {
                 address -= 16;
             }
-            
+
             state.palleteData[address % 0x20] = (byte) value;
         }
     }
