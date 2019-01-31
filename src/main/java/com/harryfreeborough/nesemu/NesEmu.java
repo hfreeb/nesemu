@@ -13,10 +13,10 @@ import java.io.InputStream;
 import java.util.Optional;
 
 public class NesEmu {
-
+    
     private static final long FRAME_TIME = Math.floorDiv(1000, 30);
     public static Debugger DEBUGGER;
-
+    
     public static void main(String[] args) {
         try {
             new NesEmu().run();
@@ -27,14 +27,14 @@ public class NesEmu {
             ex.printStackTrace();
         }
     }
-
+    
     public void run() {
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         int jfcVal = jfc.showOpenDialog(null);
         if (jfcVal != JFileChooser.APPROVE_OPTION) {
             return;
         }
-
+        
         InputStream stream;
         try {
             stream = new FileInputStream(jfc.getSelectedFile());
@@ -42,50 +42,50 @@ public class NesEmu {
             e.printStackTrace();
             return;
         }
-
+        
         Cartridge data = RomReader.read(stream)
                 .orElseThrow(() -> new RuntimeException("Failed to read rom."));
-
-
+        
+        
         Console console = new Console(data);
         DEBUGGER = new Debugger(console);
-
+        
         Cpu cpu = console.getCpu();
-
+        
         EmuFrame frame = new EmuFrame(console);
-
-
+        
+        
         long lastFrame = 0;
         int cycles = 0;
-
+        
         Optional<Integer> breakpoint = DEBUGGER.getTargetPc();
         while (true) {
             if (breakpoint.isPresent() && (breakpoint.get() == cpu.getState().regPc)) {
                 System.out.println(String.format("BREAK at $%04X", cpu.getState().regPc));
                 DEBUGGER.pause();
             }
-
+            
             if (DEBUGGER.isPaused()) {
                 if (!DEBUGGER.processPause()) {
                     continue;
                 }
             }
-
+            
             //Break on halt
             if (!cpu.tick()) {
                 DEBUGGER.pause();
                 continue;
             }
-
+            
             int catchup = (cpu.getState().cycles - cycles) * 3;
-
+            
             for (int i = 0; i < catchup; i++) {
                 if (console.getPpu().tick()) {
                     SwingUtilities.invokeLater(() -> {
                         frame.validate();
                         frame.repaint();
                     });
-
+                    
                     long now = System.currentTimeMillis();
                     long delta = now - lastFrame;
                     if (delta < FRAME_TIME) {
@@ -95,13 +95,13 @@ public class NesEmu {
                             e.printStackTrace();
                         }
                     }
-
+                    
                     lastFrame = now;
                 }
             }
-
+            
             cycles = cpu.getState().cycles;
         }
     }
-
+    
 }

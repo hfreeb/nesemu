@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EmuKeyListener implements KeyListener {
-
+    
     private static final Map<Integer, Integer> KEY_MAPPING;
-
+    
     static {
         Map<Integer, Integer> mapping = new HashMap<>();
         mapping.put(KeyEvent.VK_Z, 0);
@@ -22,21 +22,21 @@ public class EmuKeyListener implements KeyListener {
         mapping.put(KeyEvent.VK_DOWN, 5);
         mapping.put(KeyEvent.VK_LEFT, 6);
         mapping.put(KeyEvent.VK_RIGHT, 7);
-
+        
         KEY_MAPPING = Collections.unmodifiableMap(mapping);
     }
-
+    
     private final Console console;
-
+    
     public EmuKeyListener(Console console) {
         this.console = console;
     }
-
+    
     @Override
     public void keyTyped(KeyEvent event) {
-
+    
     }
-
+    
     @Override
     public void keyPressed(KeyEvent event) {
         Integer button = KEY_MAPPING.get(event.getKeyCode());
@@ -44,7 +44,7 @@ public class EmuKeyListener implements KeyListener {
             this.console.getCpu().getMemory().setButtonState(button, true);
         }
     }
-
+    
     @Override
     public void keyReleased(KeyEvent event) {
         Integer button = KEY_MAPPING.get(event.getKeyCode());
@@ -52,7 +52,7 @@ public class EmuKeyListener implements KeyListener {
             this.console.getCpu().getMemory().setButtonState(button, false);
             return;
         }
-
+        
         switch (event.getKeyCode()) {
             case KeyEvent.VK_S:
                 this.console.queueSave();

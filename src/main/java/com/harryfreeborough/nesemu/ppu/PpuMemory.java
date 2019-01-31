@@ -6,19 +6,19 @@ import com.harryfreeborough.nesemu.utils.Memory;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
 public class PpuMemory implements Memory {
-
+    
     private final Console console;
-
+    
     public PpuMemory(Console console) {
         this.console = console;
     }
-
+    
     @Override
     public int read1(int address) {
         Preconditions.checkArgument(address < 0x8000, "Address $%04X out of range.", address);
         //Ignore 15th bit but anymore than that error on
         address &= 0x3FFF;
-
+        
         PpuState state = this.console.getPpu().getState();
         if (address < 0x2000) {
             return this.console.getMapper().read1(address);
@@ -32,14 +32,14 @@ public class PpuMemory implements Memory {
             return state.palleteData[address % 0x20];
         }
     }
-
+    
     @Override
     public void write1(int address, int value) {
         Preconditions.checkArgument(address < 0x8000, "Address $%04X out of range.", address);
         Preconditions.checkArgument(value <= 0xFF, "Value $%X too large.", value);
         //Ignore 15th bit but anymore than that error on
         address &= 0x3FFF;
-
+        
         PpuState state = this.console.getPpu().getState();
         if (address < 0x2000) {
             this.console.getCartridge().getChrRomData()[address] = (byte) value;
@@ -50,11 +50,11 @@ public class PpuMemory implements Memory {
             if (address >= 0x3F10 && address % 4 == 0) {
                 address -= 16;
             }
-
+            
             state.palleteData[address % 0x20] = (byte) value;
         }
     }
-
+    
     private int mirrorAddress(MirroringMode mode, int address) {
         switch (mode) {
             case HORIZONTAL:
@@ -70,10 +70,10 @@ public class PpuMemory implements Memory {
             case SINGLE_HIGH:
                 return 0x400 + (address % 0x400);
         }
-
+        
         throw new IllegalStateException(
                 String.format("%s not implemented for translating namespace address", mode.name())
         );
     }
-
+    
 }

@@ -7,15 +7,15 @@ import javax.swing.*;
 import java.awt.*;
 
 public class EmuPanel extends JPanel {
-
+    
     private final Console console;
-
+    
     public EmuPanel(Console console) {
         super();
-
+        
         this.console = console;
     }
-
+    
     @Override
     public void paint(Graphics g) {
         for (int x = 0; x < 256; x++) {
@@ -25,5 +25,5 @@ public class EmuPanel extends JPanel {
             }
         }
     }
-
+    
 }

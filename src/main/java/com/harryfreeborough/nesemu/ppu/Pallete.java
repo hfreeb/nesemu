@@ -1,7 +1,7 @@
 package com.harryfreeborough.nesemu.ppu;
 
 public class Pallete {
-
+    
     private static final int[] colours = {
             0x666666, 0x002A88, 0x1412A7, 0x3B00A4, 0x5C007E, 0x6E0040, 0x6C0600, 0x561D00,
             0x333500, 0x0B4800, 0x005200, 0x004F08, 0x00404D, 0x000000, 0x000000, 0x000000,
@@ -12,9 +12,9 @@ public class Pallete {
             0xFFFEFF, 0xC0DFFF, 0xD3D2FF, 0xE8C8FF, 0xFBC2FF, 0xFEC4EA, 0xFECCC5, 0xF7D8A5,
             0xE4E594, 0xCFEF96, 0xBDF4AB, 0xB3F3CC, 0xB5EBF2, 0xB8B8B8, 0x000000, 0x000000,
     };
-
+    
     public static int getRgb(int id) {
         return colours[id];
     }
-
+    
 }

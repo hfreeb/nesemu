@@ -97,5 +97,5 @@ public class Console {
     public void queueLoad() {
         this.loadQueued = true;
     }
-
+    
 }
