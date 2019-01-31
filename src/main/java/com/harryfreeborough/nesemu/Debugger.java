@@ -146,8 +146,6 @@ public class Debugger {
         builder.append(String.format("%02X", cpuState.regX));
         builder.append(" Y:");
         builder.append(String.format("%02X", cpuState.regY));
-        builder.append(" P:");
-        builder.append(String.format("%02X", cpuState.regPc));
         builder.append(" SP:");
         builder.append(String.format("%02X", cpuState.regSp));
 
@@ -191,6 +189,22 @@ public class Debugger {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+    
+    public void logStateSave(CpuState state) {
+        try {
+            this.bufferedWriter.append(String.format("========== STATE SAVED, PC: $%04X ==========\n", state.regPc));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void logStateLoad(CpuState state) {
+        try {
+            this.bufferedWriter.append(String.format("========== STATE LOADED, PC: $%04X ==========\n", state.regPc));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
