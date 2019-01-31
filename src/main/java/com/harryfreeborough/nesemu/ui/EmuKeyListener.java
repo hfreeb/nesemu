@@ -58,7 +58,7 @@ public class EmuKeyListener implements KeyListener {
                 this.console.queueSave();
                 break;
             case KeyEvent.VK_L:
-                this.console.loadSave();
+                this.console.queueLoad();
                 break;
         }
     }

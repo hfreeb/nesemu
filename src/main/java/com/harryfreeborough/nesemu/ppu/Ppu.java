@@ -419,6 +419,7 @@ public class Ppu {
 
             if (this.state.scanline == 240) {
                 this.state.frame++;
+                this.console.frameEnd(); //TODO: This may cause the timing to be a bit off on save load
                 rerender = true;
             } else if (this.state.scanline == 262) {
                 this.state.scanline = 0;

@@ -86,8 +86,6 @@ public class NesEmu {
                         frame.repaint();
                     });
 
-                    console.frameEnd();
-
                     long now = System.currentTimeMillis();
                     long delta = now - lastFrame;
                     if (delta < FRAME_TIME) {

@@ -73,8 +73,33 @@ public class PpuState {
         System.arraycopy(state.nametableData, 0, this.nametableData, 0, state.nametableData.length);
         System.arraycopy(state.palleteData, 0, this.palleteData, 0, state.palleteData.length);
         System.arraycopy(state.oamData, 0, this.oamData, 0, state.oamData.length);
-
+    
+        //TODO: Remove unnecessary setting due to saving and loading on a new frame
         this.frame = state.frame;
+        this.register = state.register;
+        this.oddFrame = state.oddFrame;
+        this.regOamAddr = state.regOamAddr;
+        this.regV = state.regV;
+        this.regT = state.regT;
+        this.regX = state.regX;
+        this.flagW = state.flagW;
+        
+        this.flagNametable = state.flagNametable;
+        this.flagAddressIncrement = state.flagAddressIncrement;
+        this.flagPatternTable = state.flagPatternTable;
+        this.flagBackgroundTable = state.flagBackgroundTable;
+        this.flagSpriteSize = state.flagSpriteSize;
+        this.flagMasterSlave = state.flagMasterSlave;
+        this.flagNmiOutput = state.flagNmiOutput;
+        
+        this.flagGreyscale = state.flagGreyscale;
+        this.flagLeftmostBackground = state.flagLeftmostBackground;
+        this.flagLeftmostSprites = state.flagLeftmostSprites;
+        this.flagBackground = state.flagBackground;
+        this.flagSprites = state.flagSprites;
+        this.flagEmphRed = state.flagEmphRed;
+        this.flagEmphGreen = state.flagEmphGreen;
+        this.flagEmphBlue = state.flagEmphBlue;
     }
 
     @Override
