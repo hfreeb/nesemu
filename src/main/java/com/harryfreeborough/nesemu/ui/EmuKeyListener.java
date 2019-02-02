@@ -60,6 +60,9 @@ public class EmuKeyListener implements KeyListener {
             case KeyEvent.VK_L:
                 this.console.queueLoad();
                 break;
+            case KeyEvent.VK_R:
+                this.console.queueReset();
+                break;
         }
     }
 }

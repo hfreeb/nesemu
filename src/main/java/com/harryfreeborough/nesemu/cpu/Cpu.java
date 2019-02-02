@@ -60,20 +60,6 @@ public class Cpu {
         this.state.regPc = this.bus.read2(0xFFFA);
     }
 
-    public void reset() {
-        this.state.regPc = this.bus.read2(0xFFFC);
-        this.state.regSp = 0xFD;
-
-        this.state.flagC = false;
-        this.state.flagZ = false;
-        this.state.flagI = true;
-        this.state.flagD = false;
-        this.state.flagB = false;
-        this.state.flagU = true;
-        this.state.flagV = false;
-        this.state.flagN = false;
-    }
-
     public CpuMemory getMemory() {
         return this.bus;
     }

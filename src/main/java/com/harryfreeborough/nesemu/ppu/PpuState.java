@@ -111,4 +111,8 @@ public class PpuState {
         return state;
     }
 
+    public void reset() {
+        copy(new PpuState());
+    }
+
 }

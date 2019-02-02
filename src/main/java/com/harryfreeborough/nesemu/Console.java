@@ -20,6 +20,7 @@ public class Console {
 
     private boolean saveQueued;
     private boolean loadQueued;
+    private boolean resetQueued;
     private CpuState cpuStateSave;
     private PpuState ppuStateSave;
 
@@ -28,15 +29,16 @@ public class Console {
 
         CpuMemory cpuMemory = new CpuMemory(this);
         this.cpu = new Cpu(cpuMemory);
+        this.cpu.getState().initPc(cpuMemory);
 
         PpuMemory ppuMemory = new PpuMemory(this);
         this.ppu = new Ppu(this, ppuMemory);
-
-        reset();
     }
 
     public void reset() {
-        this.cpu.reset();
+        this.cpu.getState().reset();
+        this.cpu.getState().initPc(this.cpu.getMemory());
+        this.ppu.getState().reset();
     }
 
     public Cpu getCpu() {
@@ -73,11 +75,12 @@ public class Console {
     }
 
     public void frameEnd() {
-        if (this.saveQueued && this.loadQueued) {
-            System.out.println("Attempted to load and save on the same frame.");
-        }
-
-        if (this.saveQueued) {
+        if (this.resetQueued) {
+            reset();
+            this.resetQueued = false;
+            this.saveQueued = false;
+            this.loadQueued = false;
+        } else if (this.saveQueued) {
             this.cpuStateSave = this.cpu.getState().clone();
             this.ppuStateSave = this.ppu.getState().clone();
             NesEmu.DEBUGGER.logStateSave(this.cpuStateSave);
@@ -96,6 +99,10 @@ public class Console {
 
     public void queueLoad() {
         this.loadQueued = true;
+    }
+
+    public void queueReset() {
+        this.resetQueued = true;
     }
 
 }

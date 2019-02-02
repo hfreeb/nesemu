@@ -14,7 +14,6 @@ public class CpuMemory implements Memory {
     public final Queue<Boolean> buttonStateCache = new LinkedList<>();
     private final Console console;
 
-
     public CpuMemory(Console console) {
         this.console = console;
     }

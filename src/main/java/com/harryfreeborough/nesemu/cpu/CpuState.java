@@ -15,7 +15,7 @@ public class CpuState {
     public int regPc;
 
     //8-bit stack pointer
-    public int regSp;
+    public int regSp = 0xFD;
 
     //8-bit accumulator register
     public int regA;
@@ -38,7 +38,7 @@ public class CpuState {
 
     //Interrupt flag - Indicates whether interrupts are either prevented (false)
     //or enabled (true).
-    public boolean flagI;
+    public boolean flagI = true;
 
     //Decimal flag - Indicates whether BCD (binary coded decimal) mode is used
     //in arithmetic operations (true) or binary mode is used (false).
@@ -49,7 +49,7 @@ public class CpuState {
     public boolean flagB;
 
     //Unused flag
-    public boolean flagU;
+    public boolean flagU = true;
 
     //Overflow flag - Indicates whether the result of the previous operation
     //on the accumulator register was too large to fit in the register width
@@ -57,6 +57,10 @@ public class CpuState {
     public boolean flagV;
 
     public boolean flagN;
+
+    public void initPc(CpuMemory memory) {
+        this.regPc = memory.read2(0xFFFC);
+    }
 
     public int getStatus() {
         int status = 0;
@@ -100,6 +104,10 @@ public class CpuState {
         this.regY = state.regY;
 
         System.arraycopy(state.internalRam, 0, this.internalRam, 0, state.internalRam.length);
+    }
+
+    public void reset() {
+        copy(new CpuState()); //Bit hacky
     }
 
     @Override
