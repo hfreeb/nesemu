@@ -29,11 +29,7 @@ public class Mapper0 implements Mapper {
 
     @Override
     public void write1(int address, int value) {
-        //        if (address < 0x2000) { //PPU memory
-        //            this.cartridge.getChrRomData()[address] = (byte) value;
-        //        } else {
         throw new IllegalArgumentException(String.format("Failed to write to address $%04X", address));
-        //        }
     }
 
     @Override

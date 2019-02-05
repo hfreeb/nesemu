@@ -86,7 +86,7 @@ public class Debugger {
                 return true;
             case "q":
                 write();
-                System.exit(0); //TODO: We don't really want to be doing this..
+                System.exit(0);
             default:
                 System.out.println("Invalid command");
                 break;
@@ -95,7 +95,7 @@ public class Debugger {
         return false;
     }
 
-    public void process(Operation operation) {
+    public void logOperation(Operation operation) {
         if (!LOG && !paused) {
             return;
         }

@@ -44,7 +44,7 @@ public class Cpu {
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
 
-        NesEmu.DEBUGGER.process(operation);
+        NesEmu.DEBUGGER.logOperation(operation);
 
         this.state.regMar = mode.obtainAddress(this.bus, this.state);
         instruction.getProcessor().execute(this.bus, this.state, mode);

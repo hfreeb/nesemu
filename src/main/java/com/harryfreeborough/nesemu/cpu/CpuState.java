@@ -107,7 +107,7 @@ public class CpuState {
     }
 
     public void reset() {
-        copy(new CpuState()); //Bit hacky
+        copy(new CpuState());
     }
 
     @Override

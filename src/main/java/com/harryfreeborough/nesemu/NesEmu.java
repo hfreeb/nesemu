@@ -22,11 +22,10 @@ public class NesEmu {
     public static void main(String[] args) {
         try {
             new NesEmu().run();
-        } catch (Exception ex) {
+        } finally {
             if (DEBUGGER != null) {
                 DEBUGGER.write();
             }
-            ex.printStackTrace();
         }
     }
 

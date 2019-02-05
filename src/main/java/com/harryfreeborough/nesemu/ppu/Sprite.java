@@ -1,6 +1,6 @@
 package com.harryfreeborough.nesemu.ppu;
 
-//Reused/cached to reduce strain on GC
+//Pooled to reduce strain on GC
 public class Sprite {
 
     private int pattern;
