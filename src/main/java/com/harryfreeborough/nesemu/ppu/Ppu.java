@@ -1,11 +1,15 @@
 package com.harryfreeborough.nesemu.ppu;
 
-import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
-import static com.harryfreeborough.nesemu.utils.MemoryUtils.shiftBit;
-
 import com.harryfreeborough.nesemu.Console;
 import com.harryfreeborough.nesemu.cpu.CpuState;
 
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.shiftBit;
+
+/**
+ * Processes PPU cycles and writes colour data to the graphics backbuffer
+ * which is then read and rendered by {@link com.harryfreeborough.nesemu.ui.EmuPanel}.
+ */
 public class Ppu {
 
     private final Console console;
@@ -30,6 +34,9 @@ public class Ppu {
         this.state.dot = 340;
     }
 
+    /**
+     * Calculates the colour value for a single pixel and adds this to the backbuffer.
+     */
     public void renderPixel() {
         int x = this.state.dot - 1;
         int y = this.state.scanline;
@@ -83,9 +90,38 @@ public class Ppu {
         this.state.backbuffer[y * 256 + x] = this.console.getPpu().getState().palleteData[colour] % 64;
     }
 
+    /**
+     * Handles reading from the specified ppu register address.
+     *
+     * @param address Address of the ppu register to read from
+     * @return the value read from the specified register
+     */
     public int readRegister(int address) {
         switch (address) {
             case 0x2002: {
+                /* == PPUSTATUS ==
+                7  bit  0
+                ---- ----
+                VSO. ....
+                |||| ||||
+                |||+-++++- Least significant bits previously written into a PPU register
+                |||        (due to register not being updated for this address)
+                ||+------- Sprite overflow. The intent was for this flag to be set
+                ||         whenever more than eight sprites appear on a scanline, but a
+                ||         hardware bug causes the actual behavior to be more complicated
+                ||         and generate false positives as well as false negatives; see
+                ||         PPU sprite evaluation. This flag is set during sprite
+                ||         evaluation and cleared at dot 1 (the second dot) of the
+                ||         pre-render line.
+                |+-------- Sprite 0 Hit.  Set when a nonzero pixel of sprite 0 overlaps
+                |          a nonzero background pixel; cleared at dot 1 of the pre-render
+                |          line.  Used for raster timing.
+                +--------- Vertical blank has started (0: not in vblank; 1: in vblank).
+                           Set at dot 1 of line 241 (the line *after* the post-render
+                           line); cleared after reading $2002 and at dot 1 of the
+                           pre-render line.
+                 */
+
                 int value = this.state.register;
                 value |= shiftBit(this.state.flagSpriteOverflow, 5);
                 value |= shiftBit(this.state.flagSpriteZeroHit, 6);
@@ -95,8 +131,10 @@ public class Ppu {
                 return value;
             }
             case 0x2004:
+                // == OAMDATA ==
                 return this.state.oamData[this.state.regOamAddr];
             case 0x2007: {
+                // == PPUDATA ==
                 int value = this.memory.read1(this.state.regV);
 
                 //Buffered read
@@ -121,10 +159,37 @@ public class Ppu {
         throw new IllegalStateException(String.format("Failed to read from register $%04x.", address));
     }
 
+    /**
+     * Handles writing the specified value to the specified ppu register address.
+     *
+     * @param address Address of the ppu register written to
+     * @param value   Value written
+     */
     public void writeRegister(int address, int value) {
         this.state.register = value & 0x1F;
         switch (address) {
             case 0x2000:
+                /*
+                == PPUCTRL ==
+
+                7  bit  0
+                ---- ----
+                VPHB SINN
+                |||| ||||
+                |||| ||++- Base nametable address
+                |||| ||    (0 = $2000; 1 = $2400; 2 = $2800; 3 = $2C00)
+                |||| |+--- VRAM address increment per CPU read/write of PPUDATA
+                |||| |     (0: add 1, going across; 1: add 32, going down)
+                |||| +---- Sprite pattern table address for 8x8 sprites
+                ||||       (0: $0000; 1: $1000; ignored in 8x16 mode)
+                |||+------ Background pattern table address (0: $0000; 1: $1000)
+                ||+------- Sprite size (0: 8x8 pixels; 1: 8x16 pixels)
+                |+-------- PPU master/slave select
+                |          (0: read backdrop from EXT pins; 1: output color on EXT pins)
+                +--------- Generate an NMI at the start of the
+                           vertical blanking interval (0: off; 1: on)
+                 */
+
                 this.state.flagNametable = value & 0x03;
                 this.state.flagAddressIncrement = (value >> 2) & 0x01;
                 this.state.flagPatternTable = (value >> 3) & 0x01;
@@ -133,9 +198,27 @@ public class Ppu {
                 this.state.flagMasterSlave = (value >> 6) & 0x01;
                 this.state.flagNmiOutput = bitPresent(value, 7);
 
+                //t: ...BA.. ........ = d: ......BA
                 this.state.regT = (this.state.regT & 0x73FF) | ((value & 0x03) << 10);
                 break;
             case 0x2001:
+                /*
+                == PPUMASK ==
+
+                7  bit  0
+                ---- ----
+                BGRs bMmG
+                |||| ||||
+                |||| |||+- Greyscale (0: normal color, 1: produce a greyscale display)
+                |||| ||+-- 1: Show background in leftmost 8 pixels of screen, 0: Hide
+                |||| |+--- 1: Show sprites in leftmost 8 pixels of screen, 0: Hide
+                |||| +---- 1: Show background
+                |||+------ 1: Show sprites
+                ||+------- Emphasize red
+                |+-------- Emphasize green
+                +--------- Emphasize blue
+                 */
+
                 this.state.flagGreyscale = bitPresent(value, 0);
                 this.state.flagLeftmostBackground = bitPresent(value, 1);
                 this.state.flagLeftmostSprites = bitPresent(value, 2);
@@ -146,19 +229,31 @@ public class Ppu {
                 this.state.flagEmphBlue = bitPresent(value, 7);
                 break;
             case 0x2003:
+                // == OAMADDR ==
                 this.state.regOamAddr = value;
                 break;
             case 0x2004:
+                // == OAMDATA ==
+
                 this.state.oamData[this.state.regOamAddr] = value;
                 this.state.regOamAddr = (this.state.regOamAddr + 1) & 0xFF;
                 break;
             case 0x2005:
-                //PPUSCROLL
+                // == PPUSCROLL ==
                 if (this.state.flagW == 0) {
+                    /*
+                    t: ....... ...HGFED = d: HGFED...
+                    x:              CBA = d: .....CBA
+                    w:                  = 1
+                     */
                     this.state.regT = (this.state.regT & 0xFFE0) | (value >> 3);
                     this.state.regX = value & 0x07;
                     this.state.flagW = 1;
                 } else {
+                    /*
+                    t: CBA..HG FED..... = d: HGFEDCBA
+                    w:                  = 0
+                     */
                     this.state.regT &= 0x0C1F;
                     this.state.regT |= (value & 0x07) << 12;
                     this.state.regT |= (value & 0xF8) << 2;
@@ -166,19 +261,30 @@ public class Ppu {
                 }
                 break;
             case 0x2006:
-                //PPUADDR
+                // == PPUADDR ==
                 if (this.state.flagW == 0) {
+                    /*
+                    t: .FEDCBA ........ = d: ..FEDCBA
+                    t: X...... ........ = 0
+                    w:                  = 1
+                     */
                     this.state.regT = (this.state.regT & 0x00FF) | ((value & 0x3F) << 8);
                     this.state.flagW = 1;
                 } else {
+                    /*
+                    t: ....... HGFEDCBA = d: HGFEDCBA
+                    v                   = t
+                    w:                  = 0
+                     */
                     this.state.regT = (this.state.regT & 0x7F00) | value;
                     this.state.regV = this.state.regT;
                     this.state.flagW = 0;
                 }
                 break;
             case 0x2007:
-                //PPUDATA
+                // == PPUDATA ==
                 this.memory.write1(this.state.regV, value);
+
                 if (this.state.flagAddressIncrement == 1) {
                     this.state.regV = (this.state.regV + 32) & 0x7FFF;
                 } else {
@@ -186,7 +292,8 @@ public class Ppu {
                 }
                 break;
             case 0x4014:
-                //OAMDMA
+                // == OAMDMA ==
+
                 int page = value << 8;
                 for (int i = 0; i <= 0xFF; i++) {
                     int data = this.console.getCpu().getMemory().read1(page | i);
@@ -202,6 +309,9 @@ public class Ppu {
         }
     }
 
+    /**
+     * Increments the x value in the VRAM address.
+     */
     public void incX() {
         if ((this.state.regV & 0x001F) == 31) { //If coarse X == 31
             this.state.regV &= 0x7FE0; //Coarse X = 0
@@ -211,6 +321,9 @@ public class Ppu {
         }
     }
 
+    /**
+     * Increments the y value in the VRAM address.
+     */
     public void incY() {
         if ((this.state.regV & 0x7000) != 0x7000) { //If fine Y < 7
             this.state.regV += 0x1000; //Increment fine Y
@@ -230,16 +343,42 @@ public class Ppu {
         }
     }
 
+    /**
+     * Copy the x value from the t register to the v register.
+     *
+     * <p>
+     * Note: This is used to reset the x position at the end of every visible (and pre-render) scanline.
+     * </p>
+     */
     private void copyX() {
         //v: ....F.. ...EDCBA = t: ....F.. ...EDCBA
         this.state.regV = (this.state.regV & 0x7BE0) | (this.state.regT & 0x041F);
     }
 
+    /**
+     * Copy the y value from the t register to the v register.
+     *
+     * <p>
+     * Note: This is used to reset the y position at the end of the pre-render scanline.
+     * </p>
+     */
     private void copyY() {
         //v: IHGF.ED CBA..... = t: IHGF.ED CBA.....
         this.state.regV = (this.state.regV & 0x041F) | (this.state.regT & 0x7BE0);
     }
 
+    /**
+     * Returns the address for the low byte of the tile data for the next tile to be rendered.
+     *
+     * <p>
+     * Colour data for each pixel in the next tile to render is stored as two bytes, the low tile and high tile byte.
+     * Each of these bytes has 1 bit dedicated for each pixel in the tile.
+     * </p>
+     *
+     * <p>Note: High tile address = Low tile address + 8</p>
+     *
+     * @return address of the least significant byte of tile data
+     */
     private int getLowTileAddress() {
         int fineY = this.state.regV >> 12;
         int tile = this.state.nametableByte;
@@ -247,6 +386,10 @@ public class Ppu {
         return 0x1000 * table + 16 * tile + fineY;
     }
 
+    /**
+     * Uses the already obtained attribute table, low tile and high tile bytes to calculate
+     * the colour data for the next tile to be rendered.
+     */
     private void calculateTileData() {
         int data = 0;
         for (int i = 0; i < 8; i++) {
@@ -263,6 +406,11 @@ public class Ppu {
         this.state.tileData |= Integer.toUnsignedLong(data);
     }
 
+    /**
+     * Runs a single cycle of a renderable line (visible lines and the pre-render line).
+     *
+     * @see <a href="https://wiki.nesdev.com/w/images/d/d1/Ntsc_timing.png">Nesdev wiki PPU frame timings</a>
+     */
     private void processRenderLine() {
         boolean fetchCycle = (this.state.dot >= 1 && this.state.dot <= 256) || //Visible cycles
                 (this.state.dot >= 321 && this.state.dot <= 336);   //Pre-fetch cycles
@@ -306,6 +454,11 @@ public class Ppu {
         }
     }
 
+    /**
+     * Runs a single cycle of the pre-render line.
+     *
+     * @see <a href="https://wiki.nesdev.com/w/images/d/d1/Ntsc_timing.png">Nesdev wiki PPU frame timings</a>
+     */
     private void processPrerenderLine() {
         if (this.state.dot == 1) {
             this.state.flagNmiOccurred = false;
@@ -322,6 +475,15 @@ public class Ppu {
         }
     }
 
+    /**
+     * Calculates the colour data for a sprite.
+     * The value calculated for each of the 8 pixels in the row uses 4 bits (32-bits of data returned).
+     *
+     * @param tile    Tile index number within the pattern table of the sprite
+     * @param attribs Attribute data for the sprite
+     * @param row     Row of the sprite to calculate the values for
+     * @return colour data for sprite
+     */
     public int getSpritePattern(int tile, int attribs, int row) {
         int address;
         if (this.state.flagSpriteSize == 1) { //8x16
@@ -370,6 +532,12 @@ public class Ppu {
         return data;
     }
 
+    /**
+     * Calculates which sprites will need to be rendered on the next scanline
+     * using data from the OAM (Object Attribute Memory).
+     *
+     * <p>Note; Due to a limitation with the original NES, only 8 sprites can be rendered per scanline.</p>
+     */
     public void evaluateSprites() {
         int size = (this.state.flagSpriteSize == 1) ? 16 : 8;
 
@@ -405,10 +573,13 @@ public class Ppu {
         }
     }
 
-    //https://wiki.nesdev.com/w/images/d/d1/Ntsc_timing.png
+    /**
+     * Runs a single PPU cycle.
+     *
+     * @return whether the graphics should be redrawn from the backbuffer
+     * @see <a href="https://wiki.nesdev.com/w/images/d/d1/Ntsc_timing.png">Nesdev wiki PPU frame timings</a>
+     */
     public boolean tick() {
-        boolean rerender = false;
-
         this.state.cycle++;
         this.state.dot++;
 
@@ -419,8 +590,8 @@ public class Ppu {
 
             if (this.state.scanline == 240) {
                 this.state.frame++;
-                this.console.frameEnd(); //TODO: This may cause the timing to be a bit off on save load
-                rerender = true;
+                this.console.frameEnd();
+                return true;
             } else if (this.state.scanline == 262) {
                 this.state.scanline = 0;
 
@@ -456,7 +627,7 @@ public class Ppu {
             }
         }
 
-        return rerender;
+        return false;
     }
 
     public PpuState getState() {
