@@ -61,7 +61,7 @@ public class PpuMemory implements Memory {
     private int mirrorAddress(MirroringMode mode, int address) {
         switch (mode) {
             case HORIZONTAL:
-                int table = (address % 0x1000) / 0x0400;
+                int table = Math.floorDiv(address % 0x1000, 0x0400);
                 int offset = address % 0x0400;
                 return Math.floorDiv(table, 2) * 0x0400 + offset;
             case VERTICAL:

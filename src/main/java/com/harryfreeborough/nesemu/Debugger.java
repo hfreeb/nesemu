@@ -177,7 +177,7 @@ public class Debugger {
         builder.append(" CYC:");
         builder.append(Integer.toString(cpuState.cycles));
         builder.append(" (");
-        builder.append(cpuState.cycles / (114 * 260 * 60));
+        builder.append(Math.floorDiv(cpuState.cycles, 114 * 260 * 60));
         builder.append("s)");
 
         if (this.paused) {
