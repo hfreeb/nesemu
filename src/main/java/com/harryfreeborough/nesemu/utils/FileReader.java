@@ -3,6 +3,9 @@ package com.harryfreeborough.nesemu.utils;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Helper to read {@link InputStream} for data of a known structure.
+ */
 public class FileReader implements AutoCloseable {
 
     private final InputStream stream;

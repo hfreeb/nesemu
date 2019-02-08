@@ -3,6 +3,9 @@ package com.harryfreeborough.nesemu.cpu;
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.shiftBit;
 
+/**
+ * Holds the state that the {@link Cpu} has.
+ */
 public class CpuState {
 
     public final byte[] internalRam = new byte[0x800];

@@ -5,6 +5,9 @@ import com.harryfreeborough.nesemu.rom.MirroringMode;
 import com.harryfreeborough.nesemu.utils.Memory;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
+/**
+ * Manages all reads and writes to the CPU memory space.
+ */
 public class PpuMemory implements Memory {
 
     private final Console console;

@@ -10,6 +10,9 @@ import com.harryfreeborough.nesemu.utils.Preconditions;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Processes instructions.
+ */
 public class Cpu {
 
     private static Map<Integer, Operation> operations;
@@ -30,6 +33,11 @@ public class Cpu {
         this.state = new CpuState();
     }
 
+    /**
+     * Processes a single instruction pointed from the program counter.
+     *
+     * @return whether the end of the program has been reached
+     */
     public boolean tick() {
         int opcode = MemoryUtils.programPop1(this.bus, this.state);
 
@@ -53,6 +61,11 @@ public class Cpu {
         return true;
     }
 
+    /**
+     * Raises a non-maskable interrupt.
+     *
+     * <p>Note: The interrupt handler address is read from $FFFA.</p>
+     */
     public void raiseNmi() {
         MemoryUtils.stackPush2(this.state.regPc, this.bus, this.state);
         MemoryUtils.stackPush1(this.state.getStatus(), this.bus, this.state);

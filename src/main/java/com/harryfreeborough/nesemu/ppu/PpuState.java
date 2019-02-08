@@ -1,5 +1,8 @@
 package com.harryfreeborough.nesemu.ppu;
 
+/**
+ * Holds the state that the {@link Ppu} has.
+ */
 public class PpuState {
 
     public final byte[] nametableData = new byte[0x1000];

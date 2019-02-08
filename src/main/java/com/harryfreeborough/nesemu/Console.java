@@ -11,6 +11,9 @@ import com.harryfreeborough.nesemu.ppu.PpuMemory;
 import com.harryfreeborough.nesemu.ppu.PpuState;
 import com.harryfreeborough.nesemu.rom.Cartridge;
 
+/**
+ * Holds together all the components of the emulator.
+ */
 public class Console {
 
     private final Cpu cpu;

@@ -4,6 +4,10 @@ import com.harryfreeborough.nesemu.rom.Cartridge;
 import com.harryfreeborough.nesemu.rom.MirroringMode;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
+/**
+ * Mapper 1 - MMC1.
+ * Created by Nintendo, implemented for Legend of Zelda.
+ */
 public class Mapper1 implements Mapper {
 
     private final Cartridge cartridge;

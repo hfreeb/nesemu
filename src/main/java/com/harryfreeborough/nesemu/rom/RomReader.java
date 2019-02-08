@@ -9,6 +9,12 @@ import java.util.Optional;
 
 public class RomReader {
 
+    /**
+     * Reads an INES file from the supplied {@link InputStream} to build a {@link Cartridge}.
+     *
+     * @param stream Stream of data from the file
+     * @return {@link Optional} {@link Cartridge} data
+     */
     public static Optional<Cartridge> read(InputStream stream) {
         try (FileReader reader = new FileReader(stream)) {
             int[] verification = {'N', 'E', 'S', 0x1A};

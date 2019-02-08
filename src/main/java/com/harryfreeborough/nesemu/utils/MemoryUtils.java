@@ -3,6 +3,9 @@ package com.harryfreeborough.nesemu.utils;
 import com.harryfreeborough.nesemu.cpu.CpuMemory;
 import com.harryfreeborough.nesemu.cpu.CpuState;
 
+/**
+ * Provides utilities for easily reading from and writing to memory.
+ */
 public class MemoryUtils {
 
     private MemoryUtils() {

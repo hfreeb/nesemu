@@ -1,9 +1,12 @@
 package com.harryfreeborough.nesemu.instruction;
 
-import static com.harryfreeborough.nesemu.utils.MemoryUtils.setNZFlags;
-
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.setNZFlags;
+
+/**
+ * Represents all MOS 6502 instruction implementations.
+ */
 public enum Instruction {
 
     ADC((bus, state, mode) -> {

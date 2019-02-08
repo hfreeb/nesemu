@@ -1,5 +1,8 @@
 package com.harryfreeborough.nesemu.utils;
 
+/**
+ * Helper file to verify the state of the program.
+ */
 public class Preconditions {
 
     private Preconditions() {

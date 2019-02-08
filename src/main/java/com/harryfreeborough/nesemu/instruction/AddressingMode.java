@@ -4,6 +4,9 @@ import com.harryfreeborough.nesemu.cpu.CpuMemory;
 import com.harryfreeborough.nesemu.cpu.CpuState;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
+/**
+ * Represents all addressing modes an {@link Operation} can be.
+ */
 public enum AddressingMode {
 
     ACC("A") {

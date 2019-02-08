@@ -3,6 +3,9 @@ package com.harryfreeborough.nesemu.mapper;
 import com.harryfreeborough.nesemu.rom.MirroringMode;
 import com.harryfreeborough.nesemu.utils.Memory;
 
+/**
+ * Handles all the custom circuitry for different NES cartridges.
+ */
 public interface Mapper extends Memory {
 
     @Override

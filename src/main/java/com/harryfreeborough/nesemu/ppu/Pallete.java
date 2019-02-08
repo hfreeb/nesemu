@@ -1,5 +1,8 @@
 package com.harryfreeborough.nesemu.ppu;
 
+/**
+ * Holds palette code to RGB value mappings.
+ */
 public class Pallete {
 
     private static final int[] colours = {

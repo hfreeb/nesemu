@@ -3,6 +3,10 @@ package com.harryfreeborough.nesemu.mapper;
 import com.harryfreeborough.nesemu.rom.Cartridge;
 import com.harryfreeborough.nesemu.rom.MirroringMode;
 
+/**
+ * Mapper 0 - NROM.
+ * Created by Nintendo, implemented for Super Mario Bros and Donkey Kong support.
+ */
 public class Mapper0 implements Mapper {
 
     private final Cartridge cartridge;

@@ -3,10 +3,8 @@ package com.harryfreeborough.nesemu.ui;
 import com.harryfreeborough.nesemu.Console;
 import com.harryfreeborough.nesemu.ppu.Pallete;
 
-import java.awt.Color;
-import java.awt.Graphics;
-
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 public class EmuPanel extends JPanel {
 

@@ -2,11 +2,8 @@ package com.harryfreeborough.nesemu.ui;
 
 import com.harryfreeborough.nesemu.Console;
 
-import java.awt.Dimension;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
+import javax.swing.*;
+import java.awt.*;
 
 public class EmuFrame extends JFrame {
 

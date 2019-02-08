@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class EmuKeyListener implements KeyListener {
 
+    //Maps Java Swing KeyEvent codes to NES key indices.
     private static final Map<Integer, Integer> KEY_MAPPING;
 
     static {
@@ -34,14 +35,14 @@ public class EmuKeyListener implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent event) {
-
+        //ignored
     }
 
     @Override
     public void keyPressed(KeyEvent event) {
         Integer button = KEY_MAPPING.get(event.getKeyCode());
         if (button != null) {
-            this.console.getCpu().getMemory().setButtonState(button, true);
+            this.console.getCpu().getMemory().setButtonDown(button, true);
         }
     }
 
@@ -49,7 +50,7 @@ public class EmuKeyListener implements KeyListener {
     public void keyReleased(KeyEvent event) {
         Integer button = KEY_MAPPING.get(event.getKeyCode());
         if (button != null) {
-            this.console.getCpu().getMemory().setButtonState(button, false);
+            this.console.getCpu().getMemory().setButtonDown(button, false);
             return;
         }
 

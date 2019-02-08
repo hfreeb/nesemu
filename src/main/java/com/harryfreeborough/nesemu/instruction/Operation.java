@@ -1,75 +1,11 @@
 package com.harryfreeborough.nesemu.instruction;
 
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.ABS;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.ABX;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.ABY;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.ACC;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.IDX;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.IDY;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.IMM;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.IMP;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.IND;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.REL;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.ZPG;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.ZPX;
-import static com.harryfreeborough.nesemu.instruction.AddressingMode.ZPY;
-import static com.harryfreeborough.nesemu.instruction.Instruction.ADC;
-import static com.harryfreeborough.nesemu.instruction.Instruction.AND;
-import static com.harryfreeborough.nesemu.instruction.Instruction.ASL;
-import static com.harryfreeborough.nesemu.instruction.Instruction.BCC;
-import static com.harryfreeborough.nesemu.instruction.Instruction.BCS;
-import static com.harryfreeborough.nesemu.instruction.Instruction.BEQ;
-import static com.harryfreeborough.nesemu.instruction.Instruction.BIT;
-import static com.harryfreeborough.nesemu.instruction.Instruction.BMI;
-import static com.harryfreeborough.nesemu.instruction.Instruction.BNE;
-import static com.harryfreeborough.nesemu.instruction.Instruction.BPL;
-import static com.harryfreeborough.nesemu.instruction.Instruction.BVC;
-import static com.harryfreeborough.nesemu.instruction.Instruction.BVS;
-import static com.harryfreeborough.nesemu.instruction.Instruction.CLC;
-import static com.harryfreeborough.nesemu.instruction.Instruction.CLD;
-import static com.harryfreeborough.nesemu.instruction.Instruction.CLI;
-import static com.harryfreeborough.nesemu.instruction.Instruction.CLV;
-import static com.harryfreeborough.nesemu.instruction.Instruction.CMP;
-import static com.harryfreeborough.nesemu.instruction.Instruction.CPX;
-import static com.harryfreeborough.nesemu.instruction.Instruction.CPY;
-import static com.harryfreeborough.nesemu.instruction.Instruction.DEC;
-import static com.harryfreeborough.nesemu.instruction.Instruction.DEX;
-import static com.harryfreeborough.nesemu.instruction.Instruction.DEY;
-import static com.harryfreeborough.nesemu.instruction.Instruction.EOR;
-import static com.harryfreeborough.nesemu.instruction.Instruction.INC;
-import static com.harryfreeborough.nesemu.instruction.Instruction.INX;
-import static com.harryfreeborough.nesemu.instruction.Instruction.INY;
-import static com.harryfreeborough.nesemu.instruction.Instruction.JMP;
-import static com.harryfreeborough.nesemu.instruction.Instruction.JSR;
-import static com.harryfreeborough.nesemu.instruction.Instruction.LDA;
-import static com.harryfreeborough.nesemu.instruction.Instruction.LDX;
-import static com.harryfreeborough.nesemu.instruction.Instruction.LDY;
-import static com.harryfreeborough.nesemu.instruction.Instruction.LSR;
-import static com.harryfreeborough.nesemu.instruction.Instruction.NOP;
-import static com.harryfreeborough.nesemu.instruction.Instruction.ORA;
-import static com.harryfreeborough.nesemu.instruction.Instruction.PHA;
-import static com.harryfreeborough.nesemu.instruction.Instruction.PHP;
-import static com.harryfreeborough.nesemu.instruction.Instruction.PLA;
-import static com.harryfreeborough.nesemu.instruction.Instruction.PLP;
-import static com.harryfreeborough.nesemu.instruction.Instruction.RLA;
-import static com.harryfreeborough.nesemu.instruction.Instruction.ROL;
-import static com.harryfreeborough.nesemu.instruction.Instruction.ROR;
-import static com.harryfreeborough.nesemu.instruction.Instruction.RTI;
-import static com.harryfreeborough.nesemu.instruction.Instruction.RTS;
-import static com.harryfreeborough.nesemu.instruction.Instruction.SBC;
-import static com.harryfreeborough.nesemu.instruction.Instruction.SEC;
-import static com.harryfreeborough.nesemu.instruction.Instruction.SED;
-import static com.harryfreeborough.nesemu.instruction.Instruction.SEI;
-import static com.harryfreeborough.nesemu.instruction.Instruction.STA;
-import static com.harryfreeborough.nesemu.instruction.Instruction.STX;
-import static com.harryfreeborough.nesemu.instruction.Instruction.STY;
-import static com.harryfreeborough.nesemu.instruction.Instruction.TAX;
-import static com.harryfreeborough.nesemu.instruction.Instruction.TAY;
-import static com.harryfreeborough.nesemu.instruction.Instruction.TSX;
-import static com.harryfreeborough.nesemu.instruction.Instruction.TXA;
-import static com.harryfreeborough.nesemu.instruction.Instruction.TXS;
-import static com.harryfreeborough.nesemu.instruction.Instruction.TYA;
+import static com.harryfreeborough.nesemu.instruction.AddressingMode.*;
+import static com.harryfreeborough.nesemu.instruction.Instruction.*;
 
+/**
+ * Holds all MOS 6502 opcode to instruction and addressing mode mappings.
+ */
 public enum Operation {
 
     ADC_IMM(0x69, ADC, IMM, 2),

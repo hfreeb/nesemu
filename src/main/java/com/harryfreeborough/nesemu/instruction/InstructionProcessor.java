@@ -1,7 +1,5 @@
 package com.harryfreeborough.nesemu.instruction;
 
-import static com.harryfreeborough.nesemu.utils.MemoryUtils.setNZFlags;
-
 import com.harryfreeborough.nesemu.cpu.CpuMemory;
 import com.harryfreeborough.nesemu.cpu.CpuState;
 
@@ -9,6 +7,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.setNZFlags;
+
+/**
+ * The implementation of an {@link Instruction}.
+ */
 public interface InstructionProcessor {
 
     static InstructionProcessor load(BiConsumer<CpuState, Integer> consumer) {

@@ -5,14 +5,12 @@ import com.harryfreeborough.nesemu.rom.Cartridge;
 import com.harryfreeborough.nesemu.rom.RomReader;
 import com.harryfreeborough.nesemu.ui.EmuFrame;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Optional;
-
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileSystemView;
 
 public class NesEmu {
 

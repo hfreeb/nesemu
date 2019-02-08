@@ -1,8 +1,7 @@
 package com.harryfreeborough.nesemu.rom;
 
-import java.util.Optional;
-
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class Cartridge {
 
@@ -18,8 +17,8 @@ public class Cartridge {
     private final byte[] saveRamData;
 
     Cartridge(MirroringMode mirroringMode, boolean persistentMemory,
-            int mapperId, int prgRomSize, int chrRomSize,
-            @Nullable byte[] trainerData, byte[] prgRomData, byte[] chrRomData) {
+              int mapperId, int prgRomSize, int chrRomSize,
+              @Nullable byte[] trainerData, byte[] prgRomData, byte[] chrRomData) {
         this.mirroringMode = mirroringMode;
         this.persistentMemory = persistentMemory;
         this.mapperId = mapperId;

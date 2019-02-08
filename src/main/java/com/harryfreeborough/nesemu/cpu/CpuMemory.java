@@ -8,6 +8,9 @@ import com.harryfreeborough.nesemu.utils.Preconditions;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Manages all reads and writes to the CPU memory space.
+ */
 public class CpuMemory implements Memory {
 
     public final boolean[] buttonState = new boolean[8];
@@ -79,8 +82,8 @@ public class CpuMemory implements Memory {
         }
     }
 
-    public void setButtonState(int button, boolean value) {
-        this.buttonState[button] = value;
+    public void setButtonDown(int button, boolean down) {
+        this.buttonState[button] = down;
     }
 
 }

@@ -15,6 +15,9 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * Handles all debugging features of the emulator.
+ */
 public class Debugger {
 
     private final static Integer BREAKPOINT;
