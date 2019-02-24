@@ -2,13 +2,13 @@ package com.harryfreeborough.nesemu.ppu;
 
 import com.harryfreeborough.nesemu.Console;
 import com.harryfreeborough.nesemu.rom.MirroringMode;
-import com.harryfreeborough.nesemu.utils.Memory;
+import com.harryfreeborough.nesemu.utils.MemorySpace;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
 /**
  * Manages all reads and writes to the CPU memory space.
  */
-public class PpuMemory implements Memory {
+public class PpuMemory implements MemorySpace {
 
     private final Console console;
 

@@ -3,7 +3,7 @@ package com.harryfreeborough.nesemu.utils;
 /**
  * Represents a memory space to read from and write to.
  */
-public interface Memory {
+public interface MemorySpace {
 
     int read1(int address);
 

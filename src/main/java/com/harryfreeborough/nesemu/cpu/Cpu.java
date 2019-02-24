@@ -15,20 +15,19 @@ import java.util.Map;
  */
 public class Cpu {
 
-    private static Map<Integer, Operation> operations;
+    private static Operation[] operations = new Operation[256];
 
     static {
-        operations = new HashMap<>();
         for (Operation operation : Operation.values()) {
-            operations.put(operation.getOpcode(), operation);
+            operations[operation.getOpcode()] = operation;
         }
     }
 
-    private final CpuMemory bus;
+    private final CpuMemory memory;
     private CpuState state;
 
-    public Cpu(CpuMemory bus) {
-        this.bus = bus;
+    public Cpu(CpuMemory memory) {
+        this.memory = memory;
 
         this.state = new CpuState();
     }
@@ -39,14 +38,14 @@ public class Cpu {
      * @return whether the end of the program has been reached
      */
     public boolean tick() {
-        int opcode = MemoryUtils.programPop1(this.bus, this.state);
+        int opcode = MemoryUtils.programPop1(this.memory, this.state);
 
         if (opcode == 0) {
             System.out.println("HALTING");
             return false;
         }
 
-        Operation operation = operations.get(opcode);
+        Operation operation = operations[opcode];
         Preconditions.checkNotNull(operation, "Failed to find instruction with id: $%02X", opcode);
 
         Instruction instruction = operation.getInstruction();
@@ -54,8 +53,8 @@ public class Cpu {
 
         NesEmu.DEBUGGER.logOperation(operation);
 
-        this.state.regMar = mode.obtainAddress(this.bus, this.state);
-        instruction.getProcessor().execute(this.bus, this.state, mode);
+        this.state.regMar = mode.obtainAddress(this.memory, this.state);
+        instruction.getProcessor().execute(this.memory, this.state, mode);
         this.state.cycles += operation.getCycles();
 
         return true;
@@ -67,14 +66,14 @@ public class Cpu {
      * <p>Note: The interrupt handler address is read from $FFFA.</p>
      */
     public void raiseNmi() {
-        MemoryUtils.stackPush2(this.state.regPc, this.bus, this.state);
-        MemoryUtils.stackPush1(this.state.getStatus(), this.bus, this.state);
+        MemoryUtils.stackPush2(this.state.regPc, this.memory, this.state);
+        MemoryUtils.stackPush1(this.state.getStatus(), this.memory, this.state);
 
-        this.state.regPc = this.bus.read2(0xFFFA);
+        this.state.regPc = this.memory.read2(0xFFFA);
     }
 
     public CpuMemory getMemory() {
-        return this.bus;
+        return this.memory;
     }
 
     public CpuState getState() {

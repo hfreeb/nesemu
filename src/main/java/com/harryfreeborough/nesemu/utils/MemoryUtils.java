@@ -19,42 +19,42 @@ public class MemoryUtils {
         return ((value >> bit) & 0x01) == 0x01;
     }
 
-    public static int programPop1(CpuMemory bus, CpuState state) {
-        int value = bus.read1(state.regPc);
+    public static int programPop1(CpuMemory memory, CpuState state) {
+        int value = memory.read1(state.regPc);
         state.regPc = (state.regPc + 1) & 0xFFFF;
         return value;
     }
 
-    public static int programPop2(CpuMemory bus, CpuState state) {
-        int value = bus.read2(state.regPc);
+    public static int programPop2(CpuMemory memory, CpuState state) {
+        int value = memory.read2(state.regPc);
         state.regPc = (state.regPc + 2) & 0xFFFF;
         return value;
     }
 
-    public static void programWrite(CpuMemory bus, CpuState state, int... data) {
+    public static void programWrite(CpuMemory memory, CpuState state, int... data) {
         for (int i = 0; i < data.length; i++) {
-            bus.write1(state.regPc + i, data[i]);
+            memory.write1(state.regPc + i, data[i]);
         }
     }
 
-    public static void stackPush1(int value, CpuMemory bus, CpuState state) {
-        bus.write1(0x100 | state.regSp, value);
+    public static void stackPush1(int value, CpuMemory memory, CpuState state) {
+        memory.write1(0x100 | state.regSp, value);
         state.regSp = (state.regSp - 1) & 0xFF;
     }
 
-    public static void stackPush2(int value, CpuMemory bus, CpuState state) {
-        stackPush1(value >> 8, bus, state);
-        stackPush1(value & 0xFF, bus, state);
+    public static void stackPush2(int value, CpuMemory memory, CpuState state) {
+        stackPush1(value >> 8, memory, state);
+        stackPush1(value & 0xFF, memory, state);
     }
 
-    public static int stackPop1(CpuMemory bus, CpuState state) {
+    public static int stackPop1(CpuMemory memory, CpuState state) {
         state.regSp = (state.regSp + 1) & 0xFF;
-        return bus.read1(0x100 | state.regSp);
+        return memory.read1(0x100 | state.regSp);
     }
 
-    public static int stackPop2(CpuMemory bus, CpuState state) {
-        int lsb = stackPop1(bus, state);
-        int msb = stackPop1(bus, state);
+    public static int stackPop2(CpuMemory memory, CpuState state) {
+        int lsb = stackPop1(memory, state);
+        int msb = stackPop1(memory, state);
         return lsb | (msb << 8);
     }
 

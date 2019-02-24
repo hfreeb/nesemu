@@ -9,7 +9,7 @@ public class PpuState {
     public final int[] palleteData = new int[0x20];
     public final int[] oamData = new int[0x100];
 
-    //Not object as this is quite speed critical
+    //'Pooled' as this is quite speed critical (objects not recreated, but data set)
     public final Sprite[] sprites = new Sprite[8];
 
     public final int[] backbuffer = new int[256 * 240];

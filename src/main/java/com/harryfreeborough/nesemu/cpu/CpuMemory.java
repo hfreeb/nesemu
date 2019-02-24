@@ -1,7 +1,7 @@
 package com.harryfreeborough.nesemu.cpu;
 
 import com.harryfreeborough.nesemu.Console;
-import com.harryfreeborough.nesemu.utils.Memory;
+import com.harryfreeborough.nesemu.utils.MemorySpace;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
@@ -11,7 +11,7 @@ import java.util.Queue;
 /**
  * Manages all reads and writes to the CPU memory space.
  */
-public class CpuMemory implements Memory {
+public class CpuMemory implements MemorySpace {
 
     public final boolean[] buttonState = new boolean[8];
     public final Queue<Boolean> buttonStateCache = new LinkedList<>();
