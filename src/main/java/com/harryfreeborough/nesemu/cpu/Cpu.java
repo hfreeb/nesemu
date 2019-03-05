@@ -40,11 +40,6 @@ public class Cpu {
     public boolean tick() {
         int opcode = MemoryUtils.programPop1(this.memory, this.state);
 
-        if (opcode == 0) {
-            System.out.println("HALTING");
-            return false;
-        }
-
         Operation operation = operations[opcode];
         Preconditions.checkNotNull(operation, "Failed to find instruction with id: $%02X", opcode);
 
@@ -66,10 +61,13 @@ public class Cpu {
      * <p>Note: The interrupt handler address is read from $FFFA.</p>
      */
     public void raiseNmi() {
-        MemoryUtils.stackPush2(this.state.regPc, this.memory, this.state);
-        MemoryUtils.stackPush1(this.state.getStatus(), this.memory, this.state);
+        this.memory.stackPush2(this.state.regPc, this.state);
+        this.memory.stackPush1(this.state.getStatus(), this.state);
 
         this.state.regPc = this.memory.read2(0xFFFA);
+
+        this.state.cycles += 7;
+        this.state.flagI = true;
     }
 
     public CpuMemory getMemory() {

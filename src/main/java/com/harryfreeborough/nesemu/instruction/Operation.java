@@ -180,6 +180,7 @@ public enum Operation {
     TXS_IMP(0x9A, TXS, IMP, 2),
     TSX_IMP(0xBA, TSX, IMP, 2),
 
+    BRK_IMP(0x00, BRK, IMP, 7),
     RTI_IMP(0x40, RTI, IMP, 6),
     NOP_IMP(0xEA, NOP, IMP, 2),
 

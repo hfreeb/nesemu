@@ -47,18 +47,12 @@ public class CpuState {
     //in arithmetic operations (true) or binary mode is used (false).
     public boolean flagD;
 
-    //Break flag - Indicates whether a BRK instruction has been executed
-    //and is being handled.
-    public boolean flagB;
-
-    //Unused flag
-    public boolean flagU = true;
-
     //Overflow flag - Indicates whether the result of the previous operation
     //on the accumulator register was too large to fit in the register width
     //(less than -128 or more than 127 in the two's complement representation).
     public boolean flagV;
 
+    //Negative flag - Set when an arithmetic operation results in a negative value.
     public boolean flagN;
 
     public void initPc(CpuMemory memory) {
@@ -71,8 +65,10 @@ public class CpuState {
         status |= shiftBit(this.flagZ, 1);
         status |= shiftBit(this.flagI, 2);
         status |= shiftBit(this.flagD, 3);
-        status |= shiftBit(this.flagB, 4);
-        status |= shiftBit(this.flagU, 5);
+        //Unused flag, always set
+        status |= 1 << 4;
+        //Break flag, always set except when pushing processor status when jumping to an interrupt routine for a hardware interrupt.
+        status |= 1 << 5;
         status |= shiftBit(this.flagV, 6);
         status |= shiftBit(this.flagN, 7);
         return status;
@@ -83,8 +79,6 @@ public class CpuState {
         this.flagZ = bitPresent(value, 1);
         this.flagI = bitPresent(value, 2);
         this.flagD = bitPresent(value, 3);
-        this.flagB = bitPresent(value, 4);
-        this.flagU = bitPresent(value, 5);
         this.flagV = bitPresent(value, 6);
         this.flagN = bitPresent(value, 7);
     }
@@ -94,8 +88,6 @@ public class CpuState {
         this.flagZ = state.flagZ;
         this.flagI = state.flagI;
         this.flagD = state.flagD;
-        this.flagB = state.flagB;
-        this.flagU = state.flagU;
         this.flagV = state.flagV;
         this.flagN = state.flagN;
 

@@ -37,27 +37,6 @@ public class MemoryUtils {
         }
     }
 
-    public static void stackPush1(int value, CpuMemory memory, CpuState state) {
-        memory.write1(0x100 | state.regSp, value);
-        state.regSp = (state.regSp - 1) & 0xFF;
-    }
-
-    public static void stackPush2(int value, CpuMemory memory, CpuState state) {
-        stackPush1(value >> 8, memory, state);
-        stackPush1(value & 0xFF, memory, state);
-    }
-
-    public static int stackPop1(CpuMemory memory, CpuState state) {
-        state.regSp = (state.regSp + 1) & 0xFF;
-        return memory.read1(0x100 | state.regSp);
-    }
-
-    public static int stackPop2(CpuMemory memory, CpuState state) {
-        int lsb = stackPop1(memory, state);
-        int msb = stackPop1(memory, state);
-        return lsb | (msb << 8);
-    }
-
     public static int signedByteToInt(int b) {
         //TODO: Better logic?
         int masked = b & 0b01111111;

@@ -1,8 +1,8 @@
 package com.harryfreeborough.nesemu.instruction;
 
-import com.harryfreeborough.nesemu.utils.MemoryUtils;
-
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.setNZFlags;
+
+import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
 /**
  * Represents all MOS 6502 instruction implementations.
@@ -73,10 +73,10 @@ public enum Instruction {
     INX((memory, state, mode) -> state.regX = setNZFlags(state, (state.regX + 1) & 0xFF)),
     INC((memory, state, mode) -> mode.write1(memory, state, setNZFlags(state, (mode.read1(memory, state) + 1) & 0xFF))),
     JSR((memory, state, mode) -> {
-        MemoryUtils.stackPush2(state.regPc - 1, memory, state);
+        memory.stackPush2(state.regPc - 1, state);
         state.regPc = state.regMar;
     }),
-    RTS((memory, state, mode) -> state.regPc = MemoryUtils.stackPop2(memory, state) + 1),
+    RTS((memory, state, mode) -> state.regPc = memory.stackPop2(state) + 1),
     CLC((memory, state, mode) -> state.flagC = false),
     SEC((memory, state, mode) -> state.flagC = true),
     CLI((memory, state, mode) -> state.flagI = false),
@@ -111,16 +111,23 @@ public enum Instruction {
 
         mode.write1(memory, state, result);
     }),
-    PHA((memory, state, mode) -> MemoryUtils.stackPush1(state.regA, memory, state)),
-    PHP((memory, state, mode) -> MemoryUtils.stackPush1(state.getStatus() | 0x10, memory, state)), //TODO: Check | 0x10
-    PLP((memory, state, mode) -> state.setStatus(MemoryUtils.stackPop1(memory, state))),
-    PLA((memory, state, mode) -> state.regA = MemoryUtils.setNZFlags(state, MemoryUtils.stackPop1(memory, state))),
+    PHA((memory, state, mode) -> memory.stackPush1(state.regA, state)),
+    PHP((memory, state, mode) -> memory.stackPush1(state.getStatus(), state)),
+    PLP((memory, state, mode) -> state.setStatus(memory.stackPop1(state))),
+    PLA((memory, state, mode) -> state.regA = MemoryUtils.setNZFlags(state, memory.stackPop1(state))),
     JMP((memory, state, mode) -> state.regPc = state.regMar),
-    RTI((memory, state, mode) -> {
-        state.setStatus(MemoryUtils.stackPop1(memory, state));
-        state.regPc = MemoryUtils.stackPop2(memory, state);
+    BRK((memory, state, mode) -> {
+        MemoryUtils.programPop1(memory, state); //Read next instruction byte and throw it away
+        memory.stackPush2(state.regPc, state);
+        memory.stackPush1(state.getStatus(), state);
+        state.flagI = true;
+        state.regPc = memory.read2(0xFFFE);
     }),
-    NOP((memory, state, mode) -> { /* NOP */ }),
+    RTI((memory, state, mode) -> {
+        state.setStatus(memory.stackPop1(state));
+        state.regPc = memory.stackPop2(state);
+    }),
+    NOP((memory, state, mode) -> { /* No operation */ }),
     /* Unofficial opcodes */
     RLA(InstructionProcessor.combination(ROL, AND));
 

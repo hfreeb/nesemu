@@ -42,7 +42,7 @@ public class CpuMemory implements MemorySpace {
 
                 return 0x40 | i;
             }
-        } else if (address == 0x4017) {
+        } else if (address == 0x4017 || address == 0x4015) {
             return 0;
         } else if (address < 0x4020) {
             //APU and I/O registers
@@ -84,6 +84,27 @@ public class CpuMemory implements MemorySpace {
 
     public void setButtonDown(int button, boolean down) {
         this.buttonState[button] = down;
+    }
+
+    public void stackPush1(int value, CpuState state) {
+        write1(0x100 | state.regSp, value);
+        state.regSp = (state.regSp - 1) & 0xFF;
+    }
+
+    public void stackPush2(int value, CpuState state) {
+        stackPush1(value >> 8, state);
+        stackPush1(value & 0xFF, state);
+    }
+
+    public int stackPop1(CpuState state) {
+        state.regSp = (state.regSp + 1) & 0xFF;
+        return read1(0x100 | state.regSp);
+    }
+
+    public int stackPop2(CpuState state) {
+        int lsb = stackPop1(state);
+        int msb = stackPop1(state);
+        return lsb | (msb << 8);
     }
 
 }
