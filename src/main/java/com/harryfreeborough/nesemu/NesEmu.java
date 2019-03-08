@@ -41,23 +41,22 @@ public class NesEmu {
         long lastFrame = 0;
         int cycles = 0;
 
-        Optional<Integer> breakpoint = debugger.getTargetPc();
+        Optional<Integer> breakpoint = this.debugger.getTargetPc();
         while (true) {
             if (breakpoint.isPresent() && (breakpoint.get() == cpu.getState().regPc)) {
                 System.out.println(String.format("BREAK at $%04X", cpu.getState().regPc));
-                debugger.pause();
+                this.debugger.pause();
             }
 
-            if (debugger.isPaused()) {
-                boolean shouldExit = debugger.blockingCli(console);
+            if (this.debugger.isPaused()) {
+                boolean shouldExit = this.debugger.blockingCli(console);
                 if (shouldExit) {
                     break;
                 }
             }
-            System.out.println("Running");
 
             Operation operation = cpu.nextOperation();
-            debugger.logOperation(console, operation);
+            this.debugger.logOperation(console, operation);
             cpu.tick(operation);
 
             int catchup = (cpu.getState().cycles - cycles) * 3;
