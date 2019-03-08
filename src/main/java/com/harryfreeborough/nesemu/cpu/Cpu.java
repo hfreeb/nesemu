@@ -7,9 +7,6 @@ import com.harryfreeborough.nesemu.instruction.Operation;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Processes instructions.
  */
@@ -32,27 +29,27 @@ public class Cpu {
         this.state = new CpuState();
     }
 
-    /**
-     * Processes a single instruction pointed from the program counter.
-     *
-     * @return whether the end of the program has been reached
-     */
-    public boolean tick() {
+    public Operation nextOperation() {
         int opcode = MemoryUtils.programPop1(this.memory, this.state);
 
         Operation operation = operations[opcode];
         Preconditions.checkNotNull(operation, "Failed to find instruction with id: $%02X", opcode);
+        return operation;
+    }
 
+
+    /**
+     * Executes the specified {@link Operation}.
+     *
+     * @param operation Operation to execute
+     */
+    public void tick(Operation operation) {
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
-
-        NesEmu.DEBUGGER.logOperation(operation);
 
         this.state.regMar = mode.obtainAddress(this.memory, this.state);
         instruction.getProcessor().execute(this.memory, this.state, mode);
         this.state.cycles += operation.getCycles();
-
-        return true;
     }
 
     /**

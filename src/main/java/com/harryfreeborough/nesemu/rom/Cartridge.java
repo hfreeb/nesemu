@@ -10,13 +10,12 @@ public class Cartridge {
     private final int mapperId;
     private final int prgRomSize;
     private final int chrRomSize;
-    @Nullable
-    private final byte[] trainerData;
+    @Nullable private final byte[] trainerData;
     private final byte[] prgRomData;
     private final byte[] chrRomData;
     private final byte[] saveRamData;
 
-    Cartridge(MirroringMode mirroringMode, boolean persistentMemory,
+    public Cartridge(MirroringMode mirroringMode, boolean persistentMemory,
               int mapperId, int prgRomSize, int chrRomSize,
               @Nullable byte[] trainerData, byte[] prgRomData, byte[] chrRomData) {
         this.mirroringMode = mirroringMode;

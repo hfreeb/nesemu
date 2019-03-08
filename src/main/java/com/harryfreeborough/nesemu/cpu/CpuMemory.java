@@ -42,9 +42,9 @@ public class CpuMemory implements MemorySpace {
 
                 return 0x40 | i;
             }
-        } else if (address == 0x4017 || address == 0x4015) {
+        } else if (address == 0x4017 || address == 0x4015 || address == 0x58A9 /*???*/) {
             return 0;
-        } else if (address < 0x4020) {
+        } else if (address < 0x6000) {
             //APU and I/O registers
         } else {
             return this.console.getMapper().read1(address);

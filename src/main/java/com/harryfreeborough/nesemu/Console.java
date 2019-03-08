@@ -86,12 +86,10 @@ public class Console {
         } else if (this.saveQueued) {
             this.cpuStateSave = this.cpu.getState().clone();
             this.ppuStateSave = this.ppu.getState().clone();
-            NesEmu.DEBUGGER.logStateSave(this.cpuStateSave);
             this.saveQueued = false;
         } else if (this.loadQueued && this.cpuStateSave != null) {
             this.cpu.getState().copy(this.cpuStateSave);
             this.ppu.getState().copy(this.ppuStateSave);
-            NesEmu.DEBUGGER.logStateLoad(this.cpuStateSave);
             this.loadQueued = false;
         }
     }

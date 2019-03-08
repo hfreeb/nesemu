@@ -15,10 +15,14 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Scanner;
 
+import static com.harryfreeborough.nesemu.utils.InputUtils.parseInteger;
+
 /**
  * Handles all debugging features of the emulator.
  */
 public class Debugger {
+
+    public static String BLANK_START_PROPERTY = "debug-blank-start";
 
     private final static Integer BREAKPOINT;
     private static boolean LOG = System.getProperty("debug-log") != null;
@@ -32,14 +36,13 @@ public class Debugger {
         }
     }
 
-    private final Console console;
     private final Scanner scanner;
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
-    private boolean paused = false;
+    //Start paused if using blank cartridge
+    private boolean paused = System.getProperty(BLANK_START_PROPERTY) == null;
 
-    public Debugger(Console console) {
-        this.console = console;
+    public Debugger() {
         this.scanner = new Scanner(System.in);
 
         try {
@@ -62,43 +65,90 @@ public class Debugger {
         this.paused = true;
     }
 
-    public boolean processPause() {
-        String[] input = this.scanner.nextLine().split(" ");
+    /**
+     * Runs the debugger command line interface, blocking the current thread.
+     *
+     * @return whether the program should exit
+     */
+    public boolean blockingCli(Console console) {
+        while (true) {
+            System.out.print("(Debug) ");
 
-        switch (input[0]) {
-            case "s":
-                return true;
-            case "r1":
-                if (input.length < 2) {
-                    System.out.println("Invalid syntax");
-                } else {
-                    int value = this.console.getCpu().getMemory().read1(Integer.parseInt(input[1], 16));
-                    System.out.println(String.format("$%02X", value));
-                }
-                break;
-            case "r2":
-                if (input.length < 2) {
-                    System.out.println("Invalid syntax");
-                } else {
-                    int value = this.console.getCpu().getMemory().read2(Integer.parseInt(input[1], 16));
-                    System.out.println(String.format("$%04X", value));
-                }
-                break;
-            case "c":
-                this.paused = false;
-                return true;
-            case "q":
-                write();
-                System.exit(0);
-            default:
-                System.out.println("Invalid command");
-                break;
+            String[] input = this.scanner.nextLine().split(" ");
+
+            switch (input[0]) {
+                case "help":
+                    print("-- Help --");
+                    print("step              - Step a single instruction.");
+                    print("continue          - Continues execution.");
+                    print("r1 {addr}         - Read a single byte from the specified address");
+                    print("r2 {addr}         - Read two bytes from the specified address");
+                    print("w1 {addr} {value} - Writes a single byte to the specified address.");
+                    print("w2 {addr} {value} - Writes two bytes to the specified address.");
+                    print("quit              - Quits the program.");
+                    break;
+                case "s":
+                case "step":
+                    return false;
+                case "r1":
+                    if (input.length < 2) {
+                        invalidSyntax("r1 {addr}");
+                    } else {
+                        int value = console.getCpu().getMemory().read1(parseInteger(input[1]));
+                        System.out.println(String.format("$%02X", value));
+                    }
+                    break;
+                case "r2":
+                    if (input.length < 2) {
+                        invalidSyntax("r2 {addr}");
+                    } else {
+                        int value = console.getCpu().getMemory().read2(parseInteger(input[1]));
+                        System.out.println(String.format("$%04X", value));
+                    }
+                    break;
+                case "w1":
+                    if (input.length < 3) {
+                        invalidSyntax("w1 {addr} {value}");
+                    } else {
+                        int address = parseInteger(input[1]);
+                        int value = parseInteger(input[2]);
+
+                        console.getCpu().getMemory().write1(address, value);
+                    }
+                    break;
+                case "w2":
+                    if (input.length < 3) {
+                        invalidSyntax("w1 {addr} {value}");
+                    } else {
+                        int address = parseInteger(input[1]);
+                        int value = parseInteger(input[2]);
+
+                        console.getCpu().getMemory().write2(address, value);
+                    }
+                    break;
+                case "c":
+                case "continue":
+                    this.paused = false;
+                    return false;
+                case "q":
+                case "quit":
+                    return true;
+                default:
+                    print("Invalid command: %s. Try \"help\".", input[0]);
+                    break;
+            }
         }
-
-        return false;
     }
 
-    public void logOperation(Operation operation) {
+    private void print(String format, Object... args) {
+        System.out.println(String.format(format, args));
+    }
+
+    private void invalidSyntax(String syntax) {
+        print("Invalid syntax. Try \"%s\".", syntax);
+    }
+
+    public void logOperation(Console console, Operation operation) {
         if (!LOG && !paused) {
             return;
         }
@@ -107,8 +157,8 @@ public class Debugger {
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
 
-        CpuMemory cpuMemory = this.console.getCpu().getMemory();
-        CpuState cpuState = this.console.getCpu().getState();
+        CpuMemory cpuMemory = console.getCpu().getMemory();
+        CpuState cpuState = console.getCpu().getState();
 
         int argsLength = 0;
         String arguments = mode.getFormat();
@@ -160,7 +210,7 @@ public class Debugger {
         builder.append(status);
 
         builder.append(" PPU:");
-        PpuState ppuState = this.console.getPpu().getState();
+        PpuState ppuState = console.getPpu().getState();
         String scanline = Integer.toString(ppuState.scanline);
         for (int i = scanline.length(); i < 3; i++) {
             builder.append(" ");
@@ -192,22 +242,6 @@ public class Debugger {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    public void logStateSave(CpuState state) {
-        try {
-            this.bufferedWriter.append(String.format("========== STATE SAVED, PC: $%04X ==========\n", state.regPc));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void logStateLoad(CpuState state) {
-        try {
-            this.bufferedWriter.append(String.format("========== STATE LOADED, PC: $%04X ==========\n", state.regPc));
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

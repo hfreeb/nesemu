@@ -64,4 +64,12 @@ public class RomReader {
         return Optional.empty();
     }
 
+    /**
+     * Creates an otherwise blank cartridge with the specified PRG ROM
+     */
+    public static Cartridge blank(byte[] prgRom) {
+        return new Cartridge(MirroringMode.HORIZONTAL, false, 0,
+                prgRom.length / 0x4000, 1, null, prgRom, new byte[0x2000]);
+    }
+
 }

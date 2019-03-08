@@ -81,7 +81,7 @@ public class Ppu {
             }
 
             if (sprite.getPriority() == 0) {
-                colour = spriteColour | 0x10; //TODO: Why | 0x10?
+                colour = spriteColour | 0x10;
             } else {
                 colour = backgroundColour;
             }
