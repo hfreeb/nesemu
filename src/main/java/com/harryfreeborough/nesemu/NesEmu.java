@@ -96,10 +96,9 @@ public class NesEmu {
      * @return optional {@link Cartridge}
      */
     private Optional<Cartridge> getCartridge() {
-        String blankStart = System.getProperty(Debugger.BLANK_START_PROPERTY);
+        String blankStart = System.getProperty(Debugger.BLANK_PROPERTY);
         //Mode to debug emulator by starting at specified address with blank cartridge
         if (blankStart != null) {
-            int startAddress = Integer.parseUnsignedInt(blankStart, 16);
             byte[] prgRom = new byte[0x4000];
             //Set reset vector to 0x8000
             prgRom[0x3FFC] = 0;
