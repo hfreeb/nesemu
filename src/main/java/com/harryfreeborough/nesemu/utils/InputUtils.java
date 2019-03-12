@@ -1,5 +1,8 @@
 package com.harryfreeborough.nesemu.utils;
 
+/**
+ * Utility functions relating to taking input from the user.
+ */
 public class InputUtils {
 
     private InputUtils() {}

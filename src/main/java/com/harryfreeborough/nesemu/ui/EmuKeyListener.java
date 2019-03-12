@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Handles key events for the window.
+ */
 public class EmuKeyListener implements KeyListener {
 
     //Maps Java Swing KeyEvent codes to NES key indices.

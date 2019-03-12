@@ -38,6 +38,9 @@ public class Console {
         this.ppu = new Ppu(this, ppuMemory);
     }
 
+    /**
+     * Resets all components to their power on state.
+     */
     public void reset() {
         this.cpu.getState().reset();
         this.cpu.getState().initPc(this.cpu.getMemory());
@@ -56,6 +59,10 @@ public class Console {
         return this.cartridge;
     }
 
+    /**
+     * Sets the active cartridge, updating the {@link Mapper} used to
+     * map the cartridge data in memory.
+     */
     public void setCartridge(Cartridge cartridge) {
         this.cartridge = cartridge;
 
@@ -77,6 +84,12 @@ public class Console {
         return this.mapper;
     }
 
+    /**
+     * Handles the reset, saving and loading user commands.
+     * Should be executed at the end of a PPU frame to avoid
+     * attempting to replace the state during the execution of an
+     * instruction or scanline.
+     */
     public void frameEnd() {
         if (this.resetQueued) {
             reset();

@@ -56,7 +56,7 @@ public class CpuMemory implements MemorySpace {
             return 0;
         } else if (address < 0x6000) { //APU and I/O registers
             //Ignore
-        } else {
+        } else { //Read from the active mapper
             return this.console.getMapper().read1(address);
         }
 

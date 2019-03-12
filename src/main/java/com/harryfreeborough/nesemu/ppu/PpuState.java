@@ -77,7 +77,6 @@ public class PpuState {
         System.arraycopy(state.palleteData, 0, this.palleteData, 0, state.palleteData.length);
         System.arraycopy(state.oamData, 0, this.oamData, 0, state.oamData.length);
 
-        //TODO: Remove unnecessary setting due to saving and loading on a new frame
         this.frame = state.frame;
         this.register = state.register;
         this.oddFrame = state.oddFrame;

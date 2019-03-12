@@ -6,6 +6,9 @@ import com.harryfreeborough.nesemu.ppu.Pallete;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Panel rendered to contained in the {@link EmuFrame}.
+ */
 public class EmuPanel extends JPanel {
 
     private final Console console;

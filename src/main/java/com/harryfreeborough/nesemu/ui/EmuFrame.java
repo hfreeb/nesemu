@@ -5,6 +5,9 @@ import com.harryfreeborough.nesemu.Console;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Main UI window.
+ */
 public class EmuFrame extends JFrame {
 
     public EmuFrame(Console console) {

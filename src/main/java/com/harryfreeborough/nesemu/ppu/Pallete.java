@@ -16,6 +16,12 @@ public class Pallete {
             0xE4E594, 0xCFEF96, 0xBDF4AB, 0xB3F3CC, 0xB5EBF2, 0xB8B8B8, 0x000000, 0x000000,
     };
 
+    /**
+     * Returns the RGB colour value for the specified palette colour id.
+     *
+     * @param id Palette id
+     * @return corresponding RGB value
+     */
     public static int getRgb(int id) {
         return colours[id];
     }

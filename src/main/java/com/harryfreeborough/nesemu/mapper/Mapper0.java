@@ -32,10 +32,6 @@ public class Mapper0 implements Mapper {
         throw new IllegalArgumentException(String.format("Failed to read from address $%04X", address));
     }
 
-    @Override
-    public void write1(int address, int value) {
-        throw new IllegalArgumentException(String.format("Failed to write to address $%04X", address));
-    }
 
     @Override
     public MirroringMode getMirroringMode() {

@@ -38,7 +38,6 @@ public class MemoryUtils {
     }
 
     public static int signedByteToInt(int b) {
-        //TODO: Better logic?
         int masked = b & 0b01111111;
         if ((b & 0b10000000) != 0) {
             masked = -128 + masked;

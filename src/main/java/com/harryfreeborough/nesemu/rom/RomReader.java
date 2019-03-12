@@ -10,7 +10,7 @@ import java.util.Optional;
 public class RomReader {
 
     /**
-     * Reads an INES file from the supplied {@link InputStream} to build a {@link Cartridge}.
+     * Reads an iNES file from the supplied {@link InputStream} to build a {@link Cartridge}.
      *
      * @param stream Stream of data from the file
      * @return {@link Optional} {@link Cartridge} data

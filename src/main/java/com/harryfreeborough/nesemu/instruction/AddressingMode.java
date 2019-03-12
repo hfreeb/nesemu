@@ -5,7 +5,7 @@ import com.harryfreeborough.nesemu.cpu.CpuState;
 import com.harryfreeborough.nesemu.utils.MemoryUtils;
 
 /**
- * Represents all addressing modes an {@link Operation} can be.
+ * Represents all addressing modes an {@link Operation} can have.
  */
 public enum AddressingMode {
 
@@ -44,7 +44,7 @@ public enum AddressingMode {
         }
     },
     //TODO: ASL, LSR, ROL, ROR, DEC and INC should always take 7 cycles,
-    //TODO: should probably have a ABX_BUG enum
+    //TODO: Seperate ABX_BUG enum?
     ABX("$[1,2],X") {
         @Override
         public int obtainAddress(CpuMemory memory, CpuState state) {

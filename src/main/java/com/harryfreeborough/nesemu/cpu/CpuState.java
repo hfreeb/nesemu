@@ -10,8 +10,10 @@ public class CpuState {
 
     public final byte[] internalRam = new byte[0x800];
 
+    //Controller strobing
     public boolean flagStrobe;
 
+    //Cycles elapsed this session
     public int cycles;
 
     //16-bit program counter

@@ -3,6 +3,10 @@ package com.harryfreeborough.nesemu.rom;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
+/**
+ * Holds all the data relating to the digital representation
+ * of a cartridge. Loaded from an iNES file by {@link RomReader}.
+ */
 public class Cartridge {
 
     private final MirroringMode mirroringMode;

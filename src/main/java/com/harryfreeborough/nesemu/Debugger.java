@@ -153,7 +153,6 @@ public class Debugger {
             return;
         }
 
-        //TODO: Clean this all up
         Instruction instruction = operation.getInstruction();
         AddressingMode mode = operation.getAddressingMode();
 

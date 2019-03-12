@@ -20,6 +20,9 @@ public class NesEmu {
 
     private static final long FRAME_TIME = Math.floorDiv(1000, 30);
 
+    /**
+     * Program entry point.
+     */
     public static void main(String[] args) {
         new NesEmu().run();
     }
@@ -42,11 +45,13 @@ public class NesEmu {
 
         Optional<Integer> breakpoint = this.debugger.getTargetPc();
         while (true) {
+            //If the breakpoint has been set on the current instruction, pause execution
             if (breakpoint.isPresent() && (breakpoint.get() == cpu.getState().regPc)) {
                 System.out.println(String.format("BREAK at $%04X", cpu.getState().regPc));
                 this.debugger.pause();
             }
 
+            //If paused, run the blocking cli.
             if (this.debugger.isPaused()) {
                 boolean shouldExit = this.debugger.blockingCli(console);
                 if (shouldExit) {
@@ -58,6 +63,7 @@ public class NesEmu {
             this.debugger.logOperation(console, operation);
             cpu.tick(operation);
 
+            //Run 3 PPU cycles for each CPU cycle run
             int catchup = (cpu.getState().cycles - cycles) * 3;
 
             for (int i = 0; i < catchup; i++) {
@@ -89,7 +95,8 @@ public class NesEmu {
 
     /**
      * Reads the cartridge data using a file browser pop-up.
-     * If the debug blank cartridge flag is set, a blank cartridge will be returned.
+     * If the debug blank cartridge flag is set, a cartridge containing
+     * user specified data will be returned.
      *
      * @return optional {@link Cartridge}
      */
