@@ -22,7 +22,7 @@ import static com.harryfreeborough.nesemu.utils.InputUtils.parseInteger;
  */
 public class Debugger {
 
-    public static String BLANK_START_PROPERTY = "debug-blank-start";
+    public static String BLANK_PROPERTY = "debug-blank";
 
     private final static Integer BREAKPOINT;
     private static boolean LOG = System.getProperty("debug-log") != null;
@@ -40,7 +40,7 @@ public class Debugger {
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
     //Start paused if using blank cartridge
-    private boolean paused = System.getProperty(BLANK_START_PROPERTY) == null;
+    private boolean paused;
 
     public Debugger() {
         this.scanner = new Scanner(System.in);

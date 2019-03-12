@@ -24,7 +24,6 @@ public class NesEmu {
         new NesEmu().run();
     }
 
-
     private final Debugger debugger = new Debugger();
 
     /**
@@ -41,23 +40,22 @@ public class NesEmu {
         long lastFrame = 0;
         int cycles = 0;
 
-        Optional<Integer> breakpoint = debugger.getTargetPc();
+        Optional<Integer> breakpoint = this.debugger.getTargetPc();
         while (true) {
             if (breakpoint.isPresent() && (breakpoint.get() == cpu.getState().regPc)) {
                 System.out.println(String.format("BREAK at $%04X", cpu.getState().regPc));
-                debugger.pause();
+                this.debugger.pause();
             }
 
-            if (debugger.isPaused()) {
-                boolean shouldExit = debugger.blockingCli(console);
+            if (this.debugger.isPaused()) {
+                boolean shouldExit = this.debugger.blockingCli(console);
                 if (shouldExit) {
                     break;
                 }
             }
-            System.out.println("Running");
 
             Operation operation = cpu.nextOperation();
-            debugger.logOperation(console, operation);
+            this.debugger.logOperation(console, operation);
             cpu.tick(operation);
 
             int catchup = (cpu.getState().cycles - cycles) * 3;
@@ -96,10 +94,9 @@ public class NesEmu {
      * @return optional {@link Cartridge}
      */
     private Optional<Cartridge> getCartridge() {
-        String blankStart = System.getProperty(Debugger.BLANK_START_PROPERTY);
+        String blankStart = System.getProperty(Debugger.BLANK_PROPERTY);
         //Mode to debug emulator by starting at specified address with blank cartridge
         if (blankStart != null) {
-            int startAddress = Integer.parseUnsignedInt(blankStart, 16);
             byte[] prgRom = new byte[0x4000];
             //Set reset vector to 0x8000
             prgRom[0x3FFC] = 0;

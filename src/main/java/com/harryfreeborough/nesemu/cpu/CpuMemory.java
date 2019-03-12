@@ -50,7 +50,9 @@ public class CpuMemory implements MemorySpace {
 
                 return 0x40 | i;
             }
-        } else if (address == 0x4017 || address == 0x4015 || address == 0x58A9 /*???*/) {
+        } else if (address == 0x4017 || address == 0x4015) {
+            //Secondary controller and APU register
+            //Returning 0 keeps the game running without those implemented
             return 0;
         } else if (address < 0x6000) { //APU and I/O registers
             //Ignore
