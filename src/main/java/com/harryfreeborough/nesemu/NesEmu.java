@@ -24,7 +24,6 @@ public class NesEmu {
         new NesEmu().run();
     }
 
-
     private final Debugger debugger = new Debugger();
 
     /**

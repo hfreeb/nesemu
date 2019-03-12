@@ -40,7 +40,7 @@ public class Debugger {
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
     //Start paused if using blank cartridge
-    private boolean paused = System.getProperty(BLANK_PROPERTY) == null;
+    private boolean paused;
 
     public Debugger() {
         this.scanner = new Scanner(System.in);
