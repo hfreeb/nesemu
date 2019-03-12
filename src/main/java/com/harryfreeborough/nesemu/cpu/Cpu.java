@@ -29,6 +29,12 @@ public class Cpu {
         this.state = new CpuState();
     }
 
+    /**
+     * Retrieves and returns the next {@link Operation} from program memory
+     * and increments the program counter.
+     *
+     * @return the next operation to process
+     */
     public Operation nextOperation() {
         int opcode = MemoryUtils.programPop1(this.memory, this.state);
 

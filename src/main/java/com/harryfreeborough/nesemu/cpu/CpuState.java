@@ -1,6 +1,6 @@
 package com.harryfreeborough.nesemu.cpu;
 
-import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitSet;
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.shiftBit;
 
 /**
@@ -75,12 +75,12 @@ public class CpuState {
     }
 
     public void setStatus(int value) {
-        this.flagC = bitPresent(value, 0);
-        this.flagZ = bitPresent(value, 1);
-        this.flagI = bitPresent(value, 2);
-        this.flagD = bitPresent(value, 3);
-        this.flagV = bitPresent(value, 6);
-        this.flagN = bitPresent(value, 7);
+        this.flagC = bitSet(value, 0);
+        this.flagZ = bitSet(value, 1);
+        this.flagI = bitSet(value, 2);
+        this.flagD = bitSet(value, 3);
+        this.flagV = bitSet(value, 6);
+        this.flagN = bitSet(value, 7);
     }
 
     public void copy(CpuState state) {

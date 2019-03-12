@@ -15,7 +15,7 @@ public class MemoryUtils {
         return (flag ? 1 : 0) << shift;
     }
 
-    public static boolean bitPresent(int value, int bit) {
+    public static boolean bitSet(int value, int bit) {
         return ((value >> bit) & 0x01) == 0x01;
     }
 

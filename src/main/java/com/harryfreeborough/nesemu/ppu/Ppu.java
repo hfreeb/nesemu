@@ -3,7 +3,7 @@ package com.harryfreeborough.nesemu.ppu;
 import com.harryfreeborough.nesemu.Console;
 import com.harryfreeborough.nesemu.cpu.CpuState;
 
-import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitPresent;
+import static com.harryfreeborough.nesemu.utils.MemoryUtils.bitSet;
 import static com.harryfreeborough.nesemu.utils.MemoryUtils.shiftBit;
 
 /**
@@ -196,7 +196,7 @@ public class Ppu {
                 this.state.flagBackgroundTable = (value >> 4) & 0x01;
                 this.state.flagSpriteSize = (value >> 5) & 0x01;
                 this.state.flagMasterSlave = (value >> 6) & 0x01;
-                this.state.flagNmiOutput = bitPresent(value, 7);
+                this.state.flagNmiOutput = bitSet(value, 7);
 
                 //t: ...BA.. ........ = d: ......BA
                 this.state.regT = (this.state.regT & 0x73FF) | ((value & 0x03) << 10);
@@ -219,14 +219,14 @@ public class Ppu {
                 +--------- Emphasize blue
                  */
 
-                this.state.flagGreyscale = bitPresent(value, 0);
-                this.state.flagLeftmostBackground = bitPresent(value, 1);
-                this.state.flagLeftmostSprites = bitPresent(value, 2);
-                this.state.flagBackground = bitPresent(value, 3);
-                this.state.flagSprites = bitPresent(value, 4);
-                this.state.flagEmphRed = bitPresent(value, 5);
-                this.state.flagEmphGreen = bitPresent(value, 6);
-                this.state.flagEmphBlue = bitPresent(value, 7);
+                this.state.flagGreyscale = bitSet(value, 0);
+                this.state.flagLeftmostBackground = bitSet(value, 1);
+                this.state.flagLeftmostSprites = bitSet(value, 2);
+                this.state.flagBackground = bitSet(value, 3);
+                this.state.flagSprites = bitSet(value, 4);
+                this.state.flagEmphRed = bitSet(value, 5);
+                this.state.flagEmphGreen = bitSet(value, 6);
+                this.state.flagEmphBlue = bitSet(value, 7);
                 break;
             case 0x2003:
                 // == OAMADDR ==

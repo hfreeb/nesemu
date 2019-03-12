@@ -5,8 +5,13 @@ import com.harryfreeborough.nesemu.rom.MirroringMode;
 import com.harryfreeborough.nesemu.utils.Preconditions;
 
 /**
- * Mapper 1 - MMC1.
- * Created by Nintendo, implemented for Legend of Zelda.
+ * Mapper 1 - Nintendo's MMC1.
+ *
+ * This register uses banks to allow for a larger amount of memory
+ * than is normally possible, as well as allowing for the mirroring mode
+ * to be changed at runtime, both controlled by the control register.
+ *
+ * Used by The Legend of Zelda.
  */
 public class Mapper1 implements Mapper {
 
